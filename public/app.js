@@ -174,7 +174,7 @@ async function main(){
     state.manifest=manifest;state.seed=seed;state.catalog=seed;
     state.events=(dates.events||[]).filter(officialEvent).sort((a,b)=>a.date.localeCompare(b.date));
     state.rankings=ranks||{};state.briefs=Array.isArray(briefs)?briefs:[];
-    readStats();showCalendar();renderCatalog();showRank();showBriefing();
+    readStats();showCalendar();renderCatalog();showRank();showBriefing();renderHeroUpcoming();
     if(location.hash==="#directory"&&state.manifest.fullCatalog)loadCatalog();
   }catch(err){
     console.error("EXAM_BOOTSTRAP_FAILED",err);
@@ -317,3 +317,24 @@ function initQnetUI(){
   });
 }
 initQnetUI();
+
+
+// Horizontal fluid schedule strip. Links to the existing verified calendar.
+function renderHeroUpcoming(){
+  const host=$("heroUpcoming");
+  if(!host)return;
+  const items=state.events.filter(e=>e.date>=state.today&&officialEvent(e)).slice(0,3);
+  if(!items.length){
+    host.innerHTML='<span class="timeline-empty">새롭게 확인된 주요 일정을 준비하고 있습니다.</span>';
+    return;
+  }
+  host.innerHTML=items.map(e=>'<button type="button" class="timeline-item" data-timeline-day="'+escapeHtml(e.date)+'" aria-label="'+escapeHtml(e.title)+' 날짜로 이동"><span class="timeline-date">'+escapeHtml(e.date.slice(5).replace("-","."))+'</span><span class="timeline-title">'+escapeHtml(e.title)+'</span></button>').join("");
+}
+$("heroUpcoming")?.addEventListener("click",event=>{
+  const button=event.target.closest("[data-timeline-day]");
+  if(!button||!isoDate(button.dataset.timelineDay))return;
+  state.selected=button.dataset.timelineDay;
+  [state.year,state.month]=state.selected.slice(0,7).split("-").map(Number);
+  showCalendar();
+  document.querySelector("#calendar").scrollIntoView({behavior:"smooth",block:"start"});
+});
