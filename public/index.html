@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8fc">
+  <meta name="description" content="대한민국 국가자격·민간자격을 발급기관과 등록번호로 정확히 찾는 시험정보 서비스. 공식 출처와 시험일정, 자격정보를 제공합니다.">
+  <title>HealingMart EXAM | 대한민국 시험·자격정보</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap top-inner">
+      <a href="/" class="brand" aria-label="HealingMart EXAM 처음으로">
+        <span class="brand-logo">H<span>✳</span></span>
+        <span class="brand-name">HealingMart <b>EXAM</b><small>국가·민간자격 정보센터</small></span>
+      </a>
+      <nav class="toplinks" aria-label="바로가기">
+        <a href="#explore">자격증 찾기</a>
+        <a href="#calendar">시험 캘린더</a>
+        <a href="https://www.pqi.or.kr/" target="_blank" rel="noopener noreferrer">민간자격 원문 ↗</a>
+      </nav>
+      <span class="service-tag"><span class="status-dot"></span> 시험정보 베타</span>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="main-title">
+      <div class="hero-left">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> THE KOREA EXAM DIRECTORY</div>
+        <h1 id="main-title">당신의 다음 도전,<br><em>여기서 시작하세요.</em></h1>
+        <p>수능부터 국가자격, 민간자격까지. 자격증 이름뿐 아니라 <strong>발급기관과 등록번호</strong>를 함께 비교하세요.</p>
+        <div class="search-shell" role="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+          <label for="searchInput" class="sr-only">시험·자격증 검색</label>
+          <input id="searchInput" type="search" placeholder="예: 바리스타, 정보처리기사, 한국커피협회" autocomplete="off">
+          <button id="searchButton">검색</button>
+        </div>
+        <div class="quick-row"><span>빠른 검색</span><button data-search="바리스타">바리스타</button><button data-search="기사">기사</button><button data-search="커피">커피</button><button data-search="사회복지">사회복지</button></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-card-label">EXAM NAVIGATOR <span>✦</span></div>
+        <div class="hero-illust"><span class="halo halo-a"></span><span class="halo halo-b"></span><div class="hero-tile"><span class="tile-icon">✳</span><span class="tile-line"></span><span class="tile-line short"></span><span class="tile-check">✓</span></div><span class="orb orb-a"></span><span class="orb orb-b"></span></div>
+        <strong>시험은 인생의 중요한 일정이니까.</strong>
+        <p>정확한 출처, 중요한 날짜, 헷갈리지 않는 자격증 비교.</p>
+      </div>
+    </section>
+    <section class="stats" aria-label="데이터 현황">
+      <div class="stat"><span>현재 검색 가능</span><strong id="statTotal">—</strong><small id="statMode">초기 검증 데이터</small></div>
+      <div class="stat"><span>민간 등록</span><strong id="statPrivate">—</strong><small>기관·등록번호 기준</small></div>
+      <div class="stat"><span>국가 자격</span><strong id="statNational">—</strong><small>Q-Net 검증 항목</small></div>
+      <div class="stat"><span>시험일정 검증</span><strong id="statSchedule">—</strong><small>공식 날짜 확인분만 공개</small></div>
+    </section>
+    <section id="explore" class="section-heading">
+      <div><div class="section-kicker">EXPLORE THE DIRECTORY</div><h2>시험·자격증 찾아보기</h2><p>동일한 자격명이라도 기관과 등록번호가 다를 수 있습니다.</p></div>
+      <a class="source-link" href="https://www.pqi.or.kr/inf/qul/infQulList.do" target="_blank" rel="noopener noreferrer">공식 민간자격 검색 ↗</a>
+    </section>
+    <div class="workbench">
+      <section class="catalog" aria-label="자격증 검색 결과">
+        <div class="filter-head">
+          <div id="tabs" class="tabs" role="group" aria-label="자격증 유형">
+            <button class="active" data-type="all" aria-pressed="true">전체</button>
+            <button data-type="국가기술" aria-pressed="false">국가자격</button>
+            <button data-type="민간등록" aria-pressed="false">등록 민간자격</button>
+            <button data-type="민간공인" aria-pressed="false">국가공인 민간자격</button>
+          </div>
+        </div>
+        <div class="results-summary"><div><strong id="resultCount">검색 준비 중</strong><span id="resultHint"></span></div><button id="resetButton" class="text-btn">검색 초기화 ↺</button></div>
+        <div class="results" id="results" aria-live="polite"></div>
+        <button id="loadMore" class="load-more" hidden>더 보기 +</button>
+      </section>
+      <aside class="side-stack">
+        <section class="side-card" aria-labelledby="selected-title">
+          <div class="aside-top"><span class="aside-kicker">QUALIFICATION DETAIL</span><span class="mini-circle">↗</span></div>
+          <h3 id="selected-title">자격증 상세정보</h3>
+          <div id="detail" class="detail-content"><p class="muted">검색 결과에서 자격증을 선택하면 정보가 표시됩니다.</p></div>
+        </section>
+        <section class="side-card calendar-card" id="calendar">
+          <div class="aside-top"><span class="aside-kicker">EXAM CALENDAR</span><span class="calendar-chip">KST</span></div>
+          <div class="month-nav"><button id="prevMonth" aria-label="이전 달">‹</button><h3 id="monthTitle">2026년 10월</h3><button id="nextMonth" aria-label="다음 달">›</button></div>
+          <div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+          <div id="monthGrid" class="month-grid" aria-label="월간 시험 일정"></div>
+          <div id="dateEvents" class="date-events"></div>
+          <p class="calendar-note">확인되지 않은 날짜는 표시하지 않습니다. 접수 전 반드시 주관기관의 최신 공고를 확인하세요.</p>
+        </section>
+      </aside>
+    </div>
+    <section class="guide">
+      <div class="guide-icon">i</div><div><h3>자격증 선택 전에 꼭 확인하세요</h3><p>‘등록 민간자격’은 국가공인과 다릅니다. 발급기관·등록번호·현재 운영 여부·시험 응시료를 공식 사이트에서 확인하세요. 장단점과 활용 분야는 취업·자격 효력을 보장하는 평가가 아닌 참고 안내입니다.</p></div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap foot-inner"><span><b>HealingMart EXAM</b> · 검증 중심 시험정보</span><span>공식기관 데이터 기반 · <span id="lastSync">갱신일 확인 중</span></span></div></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
