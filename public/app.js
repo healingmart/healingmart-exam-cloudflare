@@ -190,7 +190,7 @@ function setup(){
 async function main(){
   setup();showCalendar();showRank();showBriefing();
   try{
-    const [manifest,seed,dates,ranks,briefs]=await Promise.all([json("/data/manifest.json"),json("/data/seed.json"),json("/data/schedule.json"),json("/data/rankings.json"),json("/data/briefs.json")]);
+    const [manifest,seed,dates,ranks,briefs]=await Promise.all([json("/data/manifest.json?v=vivid-period-20261030-4"),json("/data/seed.json"),json("/data/schedule.json?v=vivid-period-20261030-4"),json("/data/rankings.json"),json("/data/briefs.json")]);
     if(!Array.isArray(seed)||typeof manifest.fullCatalog!=="boolean")throw Error("Invalid manifest");
     state.manifest=manifest;state.seed=seed;state.catalog=seed;
     state.events=(dates.events||[]).filter(officialEvent).sort((a,b)=>a.date.localeCompare(b.date));
