@@ -15,7 +15,13 @@ state.selected=state.today;[state.year,state.month]=state.today.slice(0,7).split
 const json=async path=>{const r=await fetch(path,{cache:"default"});if(!r.ok)throw Error(path+": HTTP "+r.status);return r.json()};
 const classOf=r=>r.type==="민간공인"?"accredited":r.type==="민간등록"?"private":"national";
 const relevant=r=>[r.name,r.agency,r.registration,r.ministry,r.region].map(normal).join("|");
-const officialEvent=e=>e?.status==="verified"&&isoDate(e.date)&&e.title&&e.source&&e.verifiedAt&&isoDate(e.verifiedAt)&&safeUrl(e.url)&&["exam","apply","announce"].includes(e.type);
+const officialEvent=e=>e?.status==="verified"&&isoDate(e.date)&&(!e.endDate||(isoDate(e.endDate)&&e.endDate>=e.date))&&e.title&&e.source&&e.verifiedAt&&isoDate(e.verifiedAt)&&safeUrl(e.url)&&["exam","apply","announce"].includes(e.type);
+const eventEnd=e=>e.endDate&&isoDate(e.endDate)?e.endDate:e.date;
+const eventIsOn=(e,day)=>e.date<=day&&eventEnd(e)>=day;
+const eventPeriod=e=>e.endDate&&e.endDate!==e.date?shortDate(e.date)+" ~ "+shortDate(e.endDate):shortDate(e.date);
+const eventStatus=(e,day)=>eventEnd(e)===day&&e.date!==day?"오늘 종료":e.date===day?"오늘 시작":eventIsOn(e,day)?"진행 중":"예정";
+const futureEvents=()=>state.events.filter(e=>eventEnd(e)>=state.today).sort((a,b)=>(eventIsOn(a,state.today)?0:1)-(eventIsOn(b,state.today)?0:1)|| (eventIsOn(a,state.today)?eventEnd(a).localeCompare(eventEnd(b)):a.date.localeCompare(b.date)) || a.id.localeCompare(b.id));
+
 const dateOffset=iso=>Math.round((dateOf(iso)-dateOf(state.today))/86400000);
 function initHeader(){
   const now=state.today;
@@ -33,33 +39,48 @@ function showCalendar(){
   const y=state.year,m=state.month,first=new Date(Date.UTC(y,m-1,1)).getUTCDay();
   const last=new Date(Date.UTC(y,m,0)).getUTCDate();
   $("calTitle").textContent=y+"년 "+m+"월";
-  const perDay=new Map();
-  for(const e of state.events){if(e.date.startsWith(y+"-"+String(m).padStart(2,"0")))perDay.set(e.date,[...(perDay.get(e.date)||[]),e]);}
-  const total=Math.ceil((first+last)/7)*7;
+  const month=String(m).padStart(2,"0"), total=Math.ceil((first+last)/7)*7;
   let html="";
   for(let i=0;i<total;i++){
     const day=i-first+1;
     if(day<1||day>last){html+='<div class="calendar-cell outside" role="gridcell"></div>';continue;}
-    const iso=y+"-"+String(m).padStart(2,"0")+"-"+String(day).padStart(2,"0");
-    const events=perDay.get(iso)||[];
-    const classes=["calendar-cell",iso===state.selected?"active":"",iso===state.today?"is-today":""].filter(Boolean).join(" ");
-    const dots=events.length?'<span class="cell-dots">'+events.slice(0,3).map(x=>'<i class="'+x.type+'"></i>').join("")+'</span>':"";
-    html+='<button class="'+classes+'" type="button" role="gridcell" data-day="'+iso+'" aria-label="'+iso+' '+events.length+'건의 검증 일정"><span class="cell-num">'+day+'</span>'+dots+(events.length?'<span class="cell-label">'+escapeHtml(events[0].title)+'</span>':"")+'</button>';
+    const iso=y+"-"+month+"-"+String(day).padStart(2,"0");
+    const active=state.events.filter(e=>eventIsOn(e,iso));
+    const counts={apply:active.filter(e=>e.type==="apply").length,exam:active.filter(e=>e.type==="exam").length,announce:active.filter(e=>e.type==="announce").length};
+    const major=active.some(e=>e.type==="apply")?"apply":active.some(e=>e.type==="exam")?"exam":"announce";
+    const classes=["calendar-cell",iso===state.selected?"active":"",iso===state.today?"is-today":"",active.length?"has-events has-"+major:""].filter(Boolean).join(" ");
+    const chips=[["apply","접수"],["exam","시험"],["announce","발표"]].filter(([type])=>counts[type]>0);
+    const flags=chips.map(([type,label])=>'<span class="date-flag '+type+'">'+label+(counts[type]>1?'<b>'+counts[type]+'</b>':"")+'</span>').join("");
+    const marker=active.length?active.find(e=>e.type===major)||active[0]:null;
+    const caption=marker?eType(marker)+" · "+(marker.date===iso?"시작":eventEnd(marker)===iso?"종료":"기간 중"):"";
+    const aria=iso+" "+(active.length?active.length+"건 일정 · "+caption:"검증 일정 미등록");
+    html+='<button class="'+classes+'" type="button" role="gridcell" data-day="'+iso+'" aria-label="'+escapeHtml(aria)+'"><span class="cell-num">'+day+'</span>'+(active.length?'<span class="date-flags">'+flags+'</span><span class="cell-label">'+escapeHtml(caption)+'</span>':"")+'</button>';
   }
   $("calendarGrid").innerHTML=html;
   showDay();
+  renderCalendarExtras();
 }
-function eType(e){return {exam:"시험",apply:"원서접수",announce:"결과발표"}[e.type]||"일정"}
+function eType(e){return {exam:"시험",apply:"원서접수",announce:"합격 발표"}[e.type]||"일정"}
 function showDay(){
   const iso=state.selected;
   $("selectedDayNum").textContent=iso.slice(8);
   $("selectedDayWeek").textContent=dayLabel(iso)+"요일";
   $("selectedDayMonth").textContent=Number(iso.slice(5,7))+"월 "+iso.slice(0,4)+"년";
-  const list=state.events.filter(e=>e.date===iso);
-  $("dayEventList").innerHTML=list.length?list.map(e=>'<div class="day-event"><span class="type-marker '+e.type+'">'+eType(e)+'</span><div><a target="_blank" rel="noopener noreferrer" href="'+escapeHtml(safeUrl(e.url))+'">'+escapeHtml(e.title)+' ↗</a><small>'+escapeHtml(e.source)+' · '+escapeHtml(shortDate(e.verifiedAt))+' 확인</small></div></div>').join(""):'<div class="no-events"><strong>공식 확인 일정이 등록되지 않았습니다.</strong><span>일정이 없다는 뜻은 아닙니다. 주관기관의 최신 공고를 확인하세요.</span></div>';
-  const next=state.events.filter(e=>e.date>=state.today).slice(0,5);
-  $("upcomingEvents").innerHTML=next.length?next.map(e=>'<div class="upcoming-row"><span class="u-day">'+Number(e.date.slice(8))+'</span><span class="u-meta"><b>'+escapeHtml(e.title)+'</b><small>'+escapeHtml(e.date.slice(0,7))+' · '+eType(e)+' · D'+(dateOffset(e.date)>0?"-"+dateOffset(e.date):"-DAY")+'</small></span><a class="u-link" href="'+escapeHtml(safeUrl(e.url))+'" target="_blank" rel="noopener noreferrer" aria-label="'+escapeHtml(e.title)+' 원문 보기">↗</a></div>').join(""):'<div class="no-events">등록된 향후 일정이 없습니다. 공식 검증을 진행 중입니다.</div>';
+  const all=state.events.filter(e=>eventIsOn(e,iso));
+  const sorted=[...all].sort((a,b)=>({apply:0,exam:1,announce:2}[a.type]-{apply:0,exam:1,announce:2}[b.type])||a.date.localeCompare(b.date));
+  $("dayEventList").innerHTML=sorted.length?'<div class="selected-total"><strong>'+sorted.length+'건</strong>의 공식 확인 일정'+(iso===state.today?' · 오늘':'')+'</div>'+sorted.map(e=>{
+    const stateText=eventStatus(e,iso);
+    return '<div class="day-event"><span class="type-marker '+e.type+'">'+eType(e)+'</span><div><a target="_blank" rel="noopener noreferrer" href="'+escapeHtml(safeUrl(e.url))+'">'+escapeHtml(e.title)+' ↗</a><strong class="event-period">'+escapeHtml(eventPeriod(e))+'</strong><span class="event-progress '+e.type+'">'+escapeHtml(stateText)+'</span><small>'+escapeHtml(e.source)+(e.round?' · '+escapeHtml(e.round):"")+'</small>'+(e.scope?'<small class="event-scope">'+escapeHtml(e.scope)+'</small>':"")+'</div></div>';
+  }).join(""):'<div class="no-events"><strong>이 날짜에 등록된 공식 일정이 없습니다.</strong><span>미등록은 미시행을 의미하지 않습니다. 주관기관 공고를 확인하세요.</span></div>';
+  const next=futureEvents().slice(0,7);
+  $("upcomingEvents").innerHTML=next.length?next.map(e=>{
+    const ongoing=eventIsOn(e,state.today);
+    const soonDate=ongoing?eventEnd(e):e.date;
+    const diff=dateOffset(soonDate);
+    return '<div class="upcoming-row"><span class="u-day">'+soonDate.slice(5).replace("-",".")+'</span><span class="u-meta"><b>'+escapeHtml(e.title)+'</b><small>'+escapeHtml(eType(e))+' · '+escapeHtml(eventPeriod(e))+(ongoing?' · 진행 중':diff===0?' · 오늘':' · D-'+diff)+'</small></span><a class="u-link" href="'+escapeHtml(safeUrl(e.url))+'" target="_blank" rel="noopener noreferrer" aria-label="'+escapeHtml(e.title)+' 공식 공고">↗</a></div>';
+  }).join(""):'<div class="no-events">향후 검증된 일정이 없습니다. 공식 공고 확인이 필요합니다.</div>';
 }
+
 function jumpMonth(delta){
   const dt=new Date(Date.UTC(state.year,state.month-1+delta,1));
   state.year=dt.getUTCFullYear();state.month=dt.getUTCMonth()+1;
@@ -276,14 +297,14 @@ async function showOfficialQnetDetail(item){
     for(const e of events)if(!state.events.some(x=>x.id===e.id))state.events.push({...e,title:item.name+" · "+e.title});
     state.events.sort((a,b)=>a.date.localeCompare(b.date));
     if(state.manifest&&state.manifest.total)readStats();
-    showCalendar();
+    showCalendar();renderHeroUpcoming();
     body.innerHTML='<span class="class-tag national">국가자격 · 공식 Q-Net</span>'+
       '<h2 id="detailHeading">'+escapeHtml(item.name)+'</h2>'+
       '<p class="detail-lead">한국산업인력공단 종목코드 '+escapeHtml(item.itemCode)+' · '+escapeHtml(item.series||item.type||"국가자격")+'</p>'+
       '<div class="detail-label">'+year+' OFFICIAL EXAM SCHEDULE · '+number(events.length)+'건</div>'+
       (events.length?'<div class="qnet-schedule-list">'+events.map(qnetDateCard).join("")+'</div>':
         '<div class="qnet-schedule-empty">확인 가능한 해당 연도의 종목별 일정이 없습니다. 시험 미시행을 의미하지 않으며 공식 공고를 확인해 주세요.</div>')+
-      '<p class="detail-notice">일정을 누르면 캘린더에서 해당 날짜를 확인할 수 있습니다. 접수·시험 기간은 시작일을 표시하며 최종 일정은 반드시 Q-Net에서 확인하세요.</p>'+
+      '<p class="detail-notice">일정을 누르면 캘린더에서 해당 시작일과 종료일을 확인할 수 있습니다. 실제 응시일은 종목·지역·개인 배정에 따라 다를 수 있으니 Q-Net을 확인하세요.</p>'+
       '<a class="detail-source" href="'+escapeHtml(page)+'" target="_blank" rel="noopener noreferrer">Q-Net 공식 종목별 상세정보 ↗</a>';
   }catch(e){
     if(!dialog.open)return;
@@ -323,13 +344,16 @@ initQnetUI();
 function renderHeroUpcoming(){
   const host=$("heroUpcoming");
   if(!host)return;
-  const items=state.events.filter(e=>e.date>=state.today&&officialEvent(e)).slice(0,3);
-  if(!items.length){
-    host.innerHTML='<span class="timeline-empty">새롭게 확인된 주요 일정을 준비하고 있습니다.</span>';
-    return;
-  }
-  host.innerHTML=items.map(e=>'<button type="button" class="timeline-item" data-timeline-day="'+escapeHtml(e.date)+'" aria-label="'+escapeHtml(e.title)+' 날짜로 이동"><span class="timeline-date">'+escapeHtml(e.date.slice(5).replace("-","."))+'</span><span class="timeline-title">'+escapeHtml(e.title)+'</span></button>').join("");
+  const ongoing=futureEvents().filter(e=>eventIsOn(e,state.today));
+  const next=futureEvents().filter(e=>!eventIsOn(e,state.today));
+  const items=[...ongoing.slice(0,3),...next.slice(0,Math.max(0,3-ongoing.length))];
+  if(!items.length){host.innerHTML='<span class="timeline-empty">확인된 다음 일정은 아직 없습니다. 공식 공고를 참고하세요.</span>';return;}
+  host.innerHTML=items.map(e=>{
+    const day=eventIsOn(e,state.today)?state.today:e.date;
+    return '<button type="button" class="timeline-item" data-timeline-day="'+escapeHtml(day)+'" aria-label="'+escapeHtml(e.title)+' 일정 보기"><span class="timeline-date">'+(eventIsOn(e,state.today)?'<b class="timeline-live">진행 중</b>':escapeHtml(e.date.slice(5).replace("-",".")))+'</span><span class="timeline-title">'+escapeHtml(e.title)+'</span><span class="timeline-range">'+escapeHtml(eventPeriod(e))+'</span></button>';
+  }).join("");
 }
+
 $("heroUpcoming")?.addEventListener("click",event=>{
   const button=event.target.closest("[data-timeline-day]");
   if(!button||!isoDate(button.dataset.timelineDay))return;
@@ -337,4 +361,41 @@ $("heroUpcoming")?.addEventListener("click",event=>{
   [state.year,state.month]=state.selected.slice(0,7).split("-").map(Number);
   showCalendar();
   document.querySelector("#calendar").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+
+function renderCalendarExtras(){
+  const overview=$("todayOverview"),month=$("monthEventList"),count=$("monthScheduleCount");
+  if(overview){
+    const current=state.events.filter(e=>eventIsOn(e,state.today));
+    const apply=current.filter(e=>e.type==="apply").length;
+    const exam=current.filter(e=>e.type==="exam").length;
+    const ends=current.filter(e=>e.type==="apply"&&eventEnd(e)===state.today).length;
+    overview.innerHTML='<span class="overview-date">'+escapeHtml(shortDate(state.today))+' 기준</span>'+
+      '<span class="overview-text"><strong>오늘 진행 중인 공식 일정</strong>'+
+      '<span class="overview-metric apply"><b>'+apply+'</b>건 접수</span>'+
+      '<span class="overview-metric exam"><b>'+exam+'</b>건 시험기간</span>'+
+      (ends?'<span class="overview-urgent"><b>'+ends+'</b>건 오늘 접수 마감</span>':'')+
+      '</span>';
+  }
+  if(!month||!count)return;
+  const first=state.year+"-"+String(state.month).padStart(2,"0")+"-01";
+  const last=state.year+"-"+String(state.month).padStart(2,"0")+"-"+String(new Date(Date.UTC(state.year,state.month,0)).getUTCDate()).padStart(2,"0");
+  const rows=state.events.filter(e=>e.date<=last&&eventEnd(e)>=first).sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id));
+  count.textContent=number(rows.length)+"건";
+  month.innerHTML=rows.length?rows.map(e=>{
+    const range=eventPeriod(e);
+    return '<button class="month-schedule-row" type="button" data-month-day="'+escapeHtml(e.date<first?first:e.date)+'">'+
+      '<span class="month-schedule-type '+e.type+'">'+eType(e)+'</span>'+
+      '<span class="month-schedule-body"><strong>'+escapeHtml(e.title)+'</strong><small>'+escapeHtml(e.source)+(e.scope?' · '+escapeHtml(e.scope):'')+'</small></span>'+
+      '<span class="month-schedule-dates">'+escapeHtml(range)+'</span><span class="month-schedule-arrow">→</span></button>';
+  }).join(""):'<div class="month-schedule-empty">이 달에는 등록된 공식 일정이 없습니다. 시험 미시행을 의미하지는 않습니다.</div>';
+}
+$("monthEventList")?.addEventListener("click",event=>{
+  const b=event.target.closest("[data-month-day]");
+  if(!b||!isoDate(b.dataset.monthDay))return;
+  state.selected=b.dataset.monthDay;
+  [state.year,state.month]=state.selected.slice(0,7).split("-").map(Number);
+  showCalendar();
+  $("calendarGrid").scrollIntoView({behavior:"smooth",block:"center"});
 });

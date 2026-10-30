@@ -19,9 +19,16 @@ assert(Array.isArray(schedule.events),"schedule invalid");
 const dateIds=new Set();
 for(const e of schedule.events){
   assert(e.status==="verified"&&validDate(e.date)&&validDate(e.verifiedAt)&&hasHttps(e.url)&&e.id&&e.source&&e.title&&["exam","apply","announce"].includes(e.type),"unsafe event");
+  if(e.endDate) assert(validDate(e.endDate)&&e.endDate>=e.date,"invalid endDate "+e.id);
+  if(e.scope) assert(typeof e.scope==="string"&&e.scope.length<500,"invalid event scope");
   assert(!dateIds.has(e.id),"duplicate event");dateIds.add(e.id);
 }
 assert.equal(manifest.scheduleCount,schedule.events.length,"event count mismatch");
+const activeAt=date=>schedule.events.filter(e=>e.date<=date&&(!e.endDate||e.endDate>=date));
+assert(activeAt("2026-10-30").length>=7,"10/30 ongoing application and exam windows missing");
+assert(activeAt("2026-11-10").some(e=>e.type==="exam")&&activeAt("2026-11-10").some(e=>e.type==="apply"),"11/10 overlapping events missing");
+assert(activeAt("2026-11-19").some(e=>e.id==="moe-2027-csat-exam"),"official CSAT date absent");
+
 assert(Array.isArray(briefs)&&briefs.every(b=>validDate(b.published)&&hasHttps(b.url)&&b.title&&b.source),"official briefing invalid");
 for(const key of ["applicants","difficulty","growth"]){
   const r=rank[key];assert(r&&Array.isArray(r.rows),"ranking schema missing");
