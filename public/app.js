@@ -10,7 +10,7 @@ const dateOf = iso => new Date(iso+"T12:00:00Z");
 const dayLabel = iso => {const [y,m,d]=iso.split("-").map(Number);return ["일","월","화","수","목","금","토"][new Date(Date.UTC(y,m-1,d)).getUTCDay()]};
 const shortDate = iso => iso?.replace(/^(\d{4})-(\d\d)-(\d\d)$/,"$1.$2.$3")||"—";
 const GROUP = {national:"국가자격",private:"등록 민간자격",accredited:"국가공인 민간자격"};
-const state = {today:kstToday(),selected:"",year:0,month:0,events:[],catalog:[],seed:[],manifest:{},query:"",filter:"all",page:0,pageSize:12,ranking:"applicants",rankings:{},briefs:[],details:{},catalogLoading:false};
+const state = {today:kstToday(),selected:"",year:0,month:0,events:[],catalog:[],seed:[],manifest:{},query:"",filter:"all",page:0,pageSize:12,calendarType:"all",ranking:"applicants",rankings:{},briefs:[],details:{},catalogLoading:false};
 state.selected=state.today;[state.year,state.month]=state.today.slice(0,7).split("-").map(Number);
 const json=async path=>{const r=await fetch(path,{cache:"default"});if(!r.ok)throw Error(path+": HTTP "+r.status);return r.json()};
 const classOf=r=>r.type==="민간공인"?"accredited":r.type==="민간등록"?"private":"national";
@@ -45,7 +45,7 @@ function showCalendar(){
     const day=i-first+1;
     if(day<1||day>last){html+='<div class="calendar-cell outside" role="gridcell"></div>';continue;}
     const iso=y+"-"+month+"-"+String(day).padStart(2,"0");
-    const active=state.events.filter(e=>eventIsOn(e,iso));
+    const active=visibleCalendarEvents().filter(e=>eventIsOn(e,iso));
     const counts={apply:active.filter(e=>e.type==="apply").length,exam:active.filter(e=>e.type==="exam").length,announce:active.filter(e=>e.type==="announce").length};
     const major=active.some(e=>e.type==="apply")?"apply":active.some(e=>e.type==="exam")?"exam":"announce";
     const classes=["calendar-cell",iso===state.selected?"active":"",iso===state.today?"is-today":"",active.length?"has-events has-"+major:""].filter(Boolean).join(" ");
@@ -61,26 +61,43 @@ function showCalendar(){
   renderCalendarExtras();
 }
 function eType(e){return {exam:"시험",apply:"원서접수",announce:"합격 발표"}[e.type]||"일정"}
+function visibleCalendarEvents(){
+  return state.calendarType==="all"?state.events:state.events.filter(e=>e.type===state.calendarType);
+}
+function eventRowHtml(e,day){
+  const status=eventStatus(e,day);
+  return '<div class="day-event"><span class="type-marker '+e.type+'">'+eType(e)+'</span><div>'+
+    '<a target="_blank" rel="noopener noreferrer" href="'+escapeHtml(safeUrl(e.url))+'">'+escapeHtml(e.title)+' ↗</a>'+
+    '<strong class="event-period">'+escapeHtml(eventPeriod(e))+'</strong>'+
+    '<span class="event-progress '+e.type+'">'+escapeHtml(status)+'</span>'+
+    '<small>'+escapeHtml(e.source)+(e.round?' · '+escapeHtml(e.round):"")+'</small>'+
+    (e.scope?'<small class="event-scope">'+escapeHtml(e.scope)+'</small>':"")+
+    '</div></div>';
+}
 function showDay(){
   const iso=state.selected;
   $("selectedDayNum").textContent=iso.slice(8);
   $("selectedDayWeek").textContent=dayLabel(iso)+"요일";
   $("selectedDayMonth").textContent=Number(iso.slice(5,7))+"월 "+iso.slice(0,4)+"년";
-  const all=state.events.filter(e=>eventIsOn(e,iso));
-  const sorted=[...all].sort((a,b)=>({apply:0,exam:1,announce:2}[a.type]-{apply:0,exam:1,announce:2}[b.type])||a.date.localeCompare(b.date));
-  $("dayEventList").innerHTML=sorted.length?'<div class="selected-total"><strong>'+sorted.length+'건</strong>의 공식 확인 일정'+(iso===state.today?' · 오늘':'')+'</div>'+sorted.map(e=>{
-    const stateText=eventStatus(e,iso);
-    return '<div class="day-event"><span class="type-marker '+e.type+'">'+eType(e)+'</span><div><a target="_blank" rel="noopener noreferrer" href="'+escapeHtml(safeUrl(e.url))+'">'+escapeHtml(e.title)+' ↗</a><strong class="event-period">'+escapeHtml(eventPeriod(e))+'</strong><span class="event-progress '+e.type+'">'+escapeHtml(stateText)+'</span><small>'+escapeHtml(e.source)+(e.round?' · '+escapeHtml(e.round):"")+'</small>'+(e.scope?'<small class="event-scope">'+escapeHtml(e.scope)+'</small>':"")+'</div></div>';
-  }).join(""):'<div class="no-events"><strong>이 날짜에 등록된 공식 일정이 없습니다.</strong><span>미등록은 미시행을 의미하지 않습니다. 주관기관 공고를 확인하세요.</span></div>';
-  const next=futureEvents().slice(0,7);
+  const list=visibleCalendarEvents().filter(e=>eventIsOn(e,iso));
+  const sorted=[...list].sort((a,b)=>({apply:0,exam:1,announce:2}[a.type]-{apply:0,exam:1,announce:2}[b.type])||a.date.localeCompare(b.date));
+  if(sorted.length){
+    const first=sorted.slice(0,3).map(e=>eventRowHtml(e,iso)).join("");
+    const extra=sorted.length>3?'<details class="day-more"><summary>다른 일정 '+(sorted.length-3)+'건 더 보기</summary>'+
+      sorted.slice(3).map(e=>eventRowHtml(e,iso)).join("")+'</details>':"";
+    $("dayEventList").innerHTML='<div class="selected-total"><strong>'+sorted.length+'건</strong>의 공식 일정</div>'+first+extra;
+  }else{
+    $("dayEventList").innerHTML='<div class="no-events"><strong>이 날짜에 등록된 일정이 없습니다.</strong><span>미등록은 미시행을 의미하지 않습니다.</span></div>';
+  }
+  const next=futureEvents().filter(e=>state.calendarType==="all"||e.type===state.calendarType).slice(0,3);
   $("upcomingEvents").innerHTML=next.length?next.map(e=>{
-    const ongoing=eventIsOn(e,state.today);
-    const soonDate=ongoing?eventEnd(e):e.date;
-    const diff=dateOffset(soonDate);
-    return '<div class="upcoming-row"><span class="u-day">'+soonDate.slice(5).replace("-",".")+'</span><span class="u-meta"><b>'+escapeHtml(e.title)+'</b><small>'+escapeHtml(eType(e))+' · '+escapeHtml(eventPeriod(e))+(ongoing?' · 진행 중':diff===0?' · 오늘':' · D-'+diff)+'</small></span><a class="u-link" href="'+escapeHtml(safeUrl(e.url))+'" target="_blank" rel="noopener noreferrer" aria-label="'+escapeHtml(e.title)+' 공식 공고">↗</a></div>';
-  }).join(""):'<div class="no-events">향후 검증된 일정이 없습니다. 공식 공고 확인이 필요합니다.</div>';
+    const ongoing=eventIsOn(e,state.today),soonDate=ongoing?eventEnd(e):e.date,diff=dateOffset(soonDate);
+    return '<div class="upcoming-row"><span class="u-day">'+soonDate.slice(5).replace("-",".")+'</span>'+
+      '<span class="u-meta"><b>'+escapeHtml(e.title)+'</b><small>'+escapeHtml(eventPeriod(e))+
+      (ongoing?' · 진행 중':diff===0?' · 오늘':' · D-'+diff)+'</small></span>'+
+      '<a class="u-link" href="'+escapeHtml(safeUrl(e.url))+'" target="_blank" rel="noopener noreferrer" aria-label="'+escapeHtml(e.title)+' 공식 공고">↗</a></div>';
+  }).join(""):'<div class="no-events">검증된 다음 일정이 없습니다.</div>';
 }
-
 function jumpMonth(delta){
   const dt=new Date(Date.UTC(state.year,state.month-1+delta,1));
   state.year=dt.getUTCFullYear();state.month=dt.getUTCMonth()+1;
@@ -172,6 +189,16 @@ function setup(){
   $("calNext").onclick=()=>jumpMonth(1);
   $("calToday").onclick=()=>{state.selected=state.today;[state.year,state.month]=state.today.slice(0,7).split("-").map(Number);showCalendar()};
   $("calendarGrid").addEventListener("click",e=>{const b=e.target.closest("[data-day]");if(b){state.selected=b.dataset.day;showCalendar()}});
+  $("calendarTypeFilters").addEventListener("click",e=>{
+    const b=e.target.closest("[data-calendar-type]");
+    if(!b)return;
+    state.calendarType=b.dataset.calendarType;
+    for(const button of document.querySelectorAll("[data-calendar-type]")){
+      const pressed=button===b;button.classList.toggle("selected",pressed);
+      button.setAttribute("aria-pressed",String(pressed));
+    }
+    showCalendar();
+  });
   $("heroSearchBtn").onclick=()=>applyQuery($("globalSearch").value);
   $("globalSearch").addEventListener("keydown",e=>{if(e.key==="Enter")applyQuery(e.target.value)});
   document.querySelectorAll("[data-query]").forEach(b=>b.onclick=()=>applyQuery(b.dataset.query));
@@ -190,7 +217,7 @@ function setup(){
 async function main(){
   setup();showCalendar();showRank();showBriefing();
   try{
-    const [manifest,seed,dates,ranks,briefs]=await Promise.all([json("/data/manifest.json?v=vivid-period-20261030-4"),json("/data/seed.json"),json("/data/schedule.json?v=vivid-period-20261030-4"),json("/data/rankings.json"),json("/data/briefs.json")]);
+    const [manifest,seed,dates,ranks,briefs]=await Promise.all([json("/data/manifest.json?v=focus-calendar-20261030-5"),json("/data/seed.json"),json("/data/schedule.json?v=focus-calendar-20261030-5"),json("/data/rankings.json"),json("/data/briefs.json")]);
     if(!Array.isArray(seed)||typeof manifest.fullCatalog!=="boolean")throw Error("Invalid manifest");
     state.manifest=manifest;state.seed=seed;state.catalog=seed;
     state.events=(dates.events||[]).filter(officialEvent).sort((a,b)=>a.date.localeCompare(b.date));
@@ -381,7 +408,7 @@ function renderCalendarExtras(){
   if(!month||!count)return;
   const first=state.year+"-"+String(state.month).padStart(2,"0")+"-01";
   const last=state.year+"-"+String(state.month).padStart(2,"0")+"-"+String(new Date(Date.UTC(state.year,state.month,0)).getUTCDate()).padStart(2,"0");
-  const rows=state.events.filter(e=>e.date<=last&&eventEnd(e)>=first).sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id));
+  const rows=visibleCalendarEvents().filter(e=>e.date<=last&&eventEnd(e)>=first).sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id));
   count.textContent=number(rows.length)+"건";
   month.innerHTML=rows.length?rows.map(e=>{
     const range=eventPeriod(e);

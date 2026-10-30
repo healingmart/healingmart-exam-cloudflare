@@ -9,8 +9,8 @@
 <title>HealingMart EXAM | 시험 일정·자격정보</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="/style.css?v=vivid-period-20261030-4">
-<script defer src="/app.js?v=vivid-period-20261030-4"></script>
+<link rel="stylesheet" href="/style.css?v=focus-calendar-20261030-5">
+<script defer src="/app.js?v=focus-calendar-20261030-5"></script>
 </head>
 <body>
 <a class="skip" href="#main">본문 바로가기</a>
@@ -27,41 +27,37 @@
 </header>
 <main id="main">
   <section class="hero" id="overview">
-    <div class="hero-wash" aria-hidden="true"></div>
-    <div class="page-width hero-main">
-      <div class="hero-content">
-        <div class="hero-topline"><span class="hero-line"></span> 힐링편의점 시험·자격정보 서비스</div>
-        <h1>시험 준비의 시작,<br><span>정확한 일정부터.</span></h1>
-        <p class="hero-description">원서접수, 시험일, 합격 발표부터 자격증 정보까지.<br class="desktop-only"> 지금 필요한 내용을 한곳에서 찾아보세요.</p>
+    <div class="page-width hero-compact">
+      <div class="hero-compact-label">
+        <span class="hero-compact-kicker">국가자격 · 민간자격 · 공식 시험정보</span>
+        <h1>시험 캘린더</h1>
+        <p>접수부터 시험·합격 발표까지 한눈에 확인하세요.</p>
+      </div>
+      <div class="hero-compact-search">
         <div class="hero-search">
           <span class="lens" aria-hidden="true"></span>
           <label class="sr-only" for="globalSearch">시험명 또는 자격증 검색</label>
-          <input type="search" id="globalSearch" autocomplete="off" placeholder="어떤 시험을 준비하세요?">
+          <input type="search" id="globalSearch" autocomplete="off" placeholder="시험명 또는 자격증 검색">
           <button type="button" id="heroSearchBtn">검색 <span aria-hidden="true">→</span></button>
         </div>
         <div class="search-examples"><span>빠른 검색</span><button type="button" data-query="전기기사">전기기사</button><button type="button" data-query="정보처리기사">정보처리기사</button><button type="button" data-query="바리스타">바리스타</button></div>
       </div>
-      <div class="hero-side" aria-label="현재 날짜">
-        <span class="today-overline">TODAY <span class="today-hyphen">/</span> 대한민국</span>
-        <div class="today-number"><strong id="heroToday">30</strong><span>일</span></div>
-        <p>오늘의 일정부터<br>다음 시험까지 한눈에.</p>
-        <a href="#calendar">시험 캘린더 보기 <span>↗</span></a>
-      </div>
-    </div>
-    <div class="page-width hero-timeline" id="heroTimeline" aria-label="다가오는 공식 일정">
-      <span class="timeline-label">다가오는 일정 <span class="timeline-indicator"></span></span>
-      <div id="heroUpcoming" class="timeline-items"><span class="timeline-loading">공식 일정 확인 중</span></div>
-      <a href="#calendar" class="timeline-more">달력 보기 <span>→</span></a>
+      <span id="heroToday" hidden></span>
     </div>
   </section>
 
   <div class="page-width">
     <section class="section calendar-section" id="calendar">
-      <div class="section-title">
-        <div><span class="eyebrow">시험 일정</span><h2>한눈에 보는 시험 캘린더</h2><p>날짜를 선택하면 해당 날짜의 접수·시험·발표 일정을 확인할 수 있습니다.</p></div>
-        <span class="source-legend"><i></i> 공식 확인 일정</span>
+      <h2 class="sr-only">월별 시험 일정</h2>
+      <div class="calendar-actions">
+        <div class="calendar-type-filters" id="calendarTypeFilters" role="group" aria-label="일정 종류">
+          <button type="button" class="selected" data-calendar-type="all" aria-pressed="true">전체 일정</button>
+          <button type="button" data-calendar-type="apply" aria-pressed="false"><span class="filter-spot apply"></span>원서접수</button>
+          <button type="button" data-calendar-type="exam" aria-pressed="false"><span class="filter-spot exam"></span>시험</button>
+          <button type="button" data-calendar-type="announce" aria-pressed="false"><span class="filter-spot announce"></span>합격 발표</button>
+        </div>
+        <div class="today-overview" id="todayOverview" aria-live="polite">공식 시험 일정을 확인하고 있습니다.</div>
       </div>
-      <div class="today-overview" id="todayOverview" aria-live="polite">공식 시험 일정을 확인하고 있습니다.</div>
       <div class="calendar-layout">
         <div class="calendar-panel">
           <div class="calendar-toolbar"><div class="calendar-month"><h3 id="calTitle">—</h3><span class="tz-pill">KST</span></div><div class="calendar-ctrl"><button type="button" id="calToday" class="cal-today">오늘</button><button type="button" id="calPrev" aria-label="이전 달">←</button><button type="button" id="calNext" aria-label="다음 달">→</button></div></div>
@@ -74,12 +70,13 @@
           <div class="daily-date"><strong id="selectedDayNum">—</strong><div><span id="selectedDayWeek">—</span><small id="selectedDayMonth">—</small></div></div>
           <h3>이날의 시험 일정</h3>
           <div class="day-event-list" id="dayEventList"></div>
-          <div class="daily-divider"></div>
-          <div class="upcoming-title">다가오는 주요 일정 <span>공식 자료</span></div>
-          <div class="upcoming-list" id="upcomingEvents"></div>
+          <details class="upcoming-disclosure">
+            <summary>다가오는 주요 일정 <span>공식 날짜 확인 ↗</span></summary>
+            <div class="upcoming-list" id="upcomingEvents"></div>
+          </details>
         </aside>
       </div>
-      <details class="month-schedule" open><summary>이번 달 전체 시험·접수 일정 <span id="monthScheduleCount">—</span></summary><div class="month-schedule-list" id="monthEventList"></div></details>
+      <details class="month-schedule"><summary>이번 달 전체 시험·접수 일정 <span id="monthScheduleCount">—</span></summary><div class="month-schedule-list" id="monthEventList"></div></details>
     </section>
 
     <section class="number-strip" aria-label="자격정보 자료 현황">
