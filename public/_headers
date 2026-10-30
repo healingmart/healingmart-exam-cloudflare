@@ -19,5 +19,17 @@
 /data/details/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-/data/*
-  Cache-Control: public, max-age=120, stale-while-revalidate=600
+/data/seed.json
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/data/manifest.json
+  Cache-Control: public, max-age=60, stale-while-revalidate=300
+
+/data/schedule.json
+  Cache-Control: public, max-age=180, stale-while-revalidate=600
+
+/data/rankings.json
+  Cache-Control: public, max-age=300, stale-while-revalidate=600
+
+/data/briefs.json
+  Cache-Control: public, max-age=300, stale-while-revalidate=600
