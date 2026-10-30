@@ -176,3 +176,137 @@ async function main(){
   }
 }
 main();
+
+
+// Q-Net live integration. Runs only for searches the visitor actually makes.
+// Existing PQI static search remains independent; no API key is exposed to the browser.
+const qnetUI = {requestId:0, timer:0, entries:[], cached:new Map(), selectedItems:[], selectedName:""};
+function qnetEnabled(){
+  return state.filter==="all"||state.filter==="national";
+}
+function qnetCard(item){
+  return '<button type="button" class="qnet-result-row" data-qnet-code="'+escapeHtml(item.itemCode)+'">'+
+    '<span class="qnet-number">'+escapeHtml(item.itemCode)+'</span>'+
+    '<span class="qnet-result-copy"><strong>'+escapeHtml(item.name)+'</strong><small>'+escapeHtml(item.type||"국가자격")+' · '+escapeHtml(item.series||"한국산업인력공단")+'</small></span>'+
+    '<span class="qnet-view">일정 확인 <span>↗</span></span></button>';
+}
+function showQnetResults(status,msg){
+  const holder=$("qnetResults");
+  if(!holder)return;
+  const active=qnetEnabled()&&normal(state.query).length>=2;
+  holder.hidden=!active;
+  if(!active)return;
+  const head='<div class="qnet-head"><div><span class="qnet-eyebrow">OFFICIAL / Q-NET</span><h3>국가기술·전문자격 공식 조회</h3><p>원서접수 · 필기 · 실기 · 합격 발표를 주관기관에서 직접 확인합니다.</p></div><a href="https://www.q-net.or.kr/" target="_blank" rel="noopener noreferrer">Q-NET 원문 ↗</a></div>';
+  if(status==="loading"){
+    holder.innerHTML=head+'<div class="qnet-message">공식 Q-Net 자격목록을 확인하고 있습니다.</div>';return;
+  }
+  if(status==="error"){
+    holder.innerHTML=head+'<div class="qnet-message">공식 API가 현재 응답하지 않습니다. 민간자격 검색은 계속 이용할 수 있습니다. <a href="https://www.q-net.or.kr/" target="_blank" rel="noopener noreferrer">Q-Net에서 직접 조회 ↗</a></div>';return;
+  }
+  if(!qnetUI.entries.length){
+    holder.innerHTML=head+'<div class="qnet-message">해당 검색어로 확인된 국가자격 종목이 없습니다.</div>';return;
+  }
+  holder.innerHTML=head+'<div class="qnet-result-count">'+number(qnetUI.entries.length)+'개 표시 · 공식 종목코드 기준</div>'+
+    qnetUI.entries.map(qnetCard).join("");
+}
+async function queryQnet(){
+  const query=state.query.trim(),current=++qnetUI.requestId;
+  if(!qnetEnabled()||normal(query).length<2||normal(query).length>60){
+    qnetUI.entries=[];showQnetResults("empty");return;
+  }
+  const k=normal(query);
+  if(qnetUI.cached.has(k)){
+    qnetUI.entries=qnetUI.cached.get(k);showQnetResults("done");return;
+  }
+  qnetUI.entries=[];showQnetResults("loading");
+  try{
+    const res=await fetch("/api/qnet/items?q="+encodeURIComponent(query)+"&limit=20");
+    const data=await res.json();
+    if(!res.ok||data.status!=="ok"||!Array.isArray(data.items))throw Error("OFFICIAL_QNET_UNAVAILABLE");
+    if(current!==qnetUI.requestId)return;
+    qnetUI.entries=data.items.filter(r=>/^[A-Z0-9]{4}$/.test(r.itemCode)&&r.name&&safeUrl(r.officialUrl));
+    qnetUI.cached.set(k,qnetUI.entries);
+    showQnetResults("done");
+  }catch(e){
+    if(current!==qnetUI.requestId)return;
+    qnetUI.entries=[];showQnetResults("error");
+  }
+}
+function enqueueQnet(delay=0){
+  clearTimeout(qnetUI.timer);
+  qnetUI.timer=setTimeout(queryQnet,delay);
+}
+function qnetDateCard(event){
+  const end=event.endDate&&event.endDate!==event.date?" ~ "+escapeHtml(event.endDate):"";
+  const colorClass=["exam","apply","announce"].includes(event.type)?event.type:"exam";
+  const label=event.type==="apply"?"접수":event.type==="announce"?"발표":"시험";
+  return '<button type="button" class="qnet-date" data-qnet-day="'+escapeHtml(event.date)+'">'+
+    '<span class="type-marker '+colorClass+'">'+label+'</span>'+
+    '<span class="qnet-date-copy"><strong>'+escapeHtml(event.title)+'</strong><small>'+escapeHtml(event.round)+' · '+escapeHtml(event.date)+end+'</small></span>'+
+    '<span class="qnet-date-arrow">→</span></button>';
+}
+async function showOfficialQnetDetail(item){
+  const dialog=$("detailDialog"),body=$("detailBody");
+  if(!dialog.open)dialog.showModal();
+  const year=Number(state.today.slice(0,4));
+  const page=safeUrl(item.officialUrl)||"https://www.q-net.or.kr/";
+  body.innerHTML='<span class="class-tag national">국가자격 · 공식 Q-Net</span>'+
+    '<h2 id="detailHeading">'+escapeHtml(item.name)+'</h2>'+
+    '<p class="detail-lead">한국산업인력공단 종목코드 '+escapeHtml(item.itemCode)+' · '+escapeHtml(item.series||item.type||"국가자격")+'</p>'+
+    '<div class="detail-label">OFFICIAL EXAM SCHEDULE / '+year+'</div>'+
+    '<p class="detail-lead">공식 종목별 시행일정을 확인하고 있습니다.</p>';
+  try{
+    const response=await fetch("/api/qnet/schedule?jmCd="+encodeURIComponent(item.itemCode)+"&year="+year);
+    const data=await response.json();
+    if(!response.ok||data.status!=="ok"||!Array.isArray(data.events))throw Error("SCHEDULE_UNAVAILABLE");
+    if(!dialog.open||!body.textContent.includes(item.itemCode))return;
+    const events=data.events.filter(officialEvent);
+    // One selected qualification at a time. Preserve baseline verified calendar events.
+    const owned=new Set(qnetUI.selectedItems);
+    state.events=state.events.filter(x=>!owned.has(x.id));
+    qnetUI.selectedItems=events.map(x=>x.id);
+    qnetUI.selectedName=item.name;
+    for(const e of events)if(!state.events.some(x=>x.id===e.id))state.events.push({...e,title:item.name+" · "+e.title});
+    state.events.sort((a,b)=>a.date.localeCompare(b.date));
+    if(state.manifest&&state.manifest.total)readStats();
+    showCalendar();
+    body.innerHTML='<span class="class-tag national">국가자격 · 공식 Q-Net</span>'+
+      '<h2 id="detailHeading">'+escapeHtml(item.name)+'</h2>'+
+      '<p class="detail-lead">한국산업인력공단 종목코드 '+escapeHtml(item.itemCode)+' · '+escapeHtml(item.series||item.type||"국가자격")+'</p>'+
+      '<div class="detail-label">'+year+' OFFICIAL EXAM SCHEDULE · '+number(events.length)+'건</div>'+
+      (events.length?'<div class="qnet-schedule-list">'+events.map(qnetDateCard).join("")+'</div>':
+        '<div class="qnet-schedule-empty">확인 가능한 해당 연도의 종목별 일정이 없습니다. 시험 미시행을 의미하지 않으며 공식 공고를 확인해 주세요.</div>')+
+      '<p class="detail-notice">일정을 누르면 캘린더에서 해당 날짜를 확인할 수 있습니다. 접수·시험 기간은 시작일을 표시하며 최종 일정은 반드시 Q-Net에서 확인하세요.</p>'+
+      '<a class="detail-source" href="'+escapeHtml(page)+'" target="_blank" rel="noopener noreferrer">Q-Net 공식 종목별 상세정보 ↗</a>';
+  }catch(e){
+    if(!dialog.open)return;
+    body.innerHTML='<span class="class-tag national">국가자격 · 공식 Q-Net</span><h2 id="detailHeading">'+escapeHtml(item.name)+'</h2>'+
+      '<p class="detail-lead">공식 종목별 일정을 확인할 수 없습니다. 임의의 시험일을 표시하지 않습니다.</p>'+
+      '<a class="detail-source" href="'+escapeHtml(page)+'" target="_blank" rel="noopener noreferrer">Q-Net에서 직접 확인 ↗</a>';
+  }
+}
+function initQnetUI(){
+  $("heroSearchBtn").addEventListener("click",()=>enqueueQnet());
+  $("globalSearch").addEventListener("keydown",e=>{if(e.key==="Enter")enqueueQnet()});
+  document.querySelectorAll("[data-query]").forEach(b=>b.addEventListener("click",()=>enqueueQnet()));
+  $("directoryInput").addEventListener("input",()=>enqueueQnet(330));
+  $("clearSearch").addEventListener("click",()=>{qnetUI.requestId++;clearTimeout(qnetUI.timer);qnetUI.entries=[];showQnetResults("empty")});
+  $("filterTabs").addEventListener("click",()=>enqueueQnet());
+  $("qnetResults").addEventListener("click",e=>{
+    const button=e.target.closest("[data-qnet-code]");
+    if(!button)return;
+    const item=qnetUI.entries.find(x=>x.itemCode===button.dataset.qnetCode);
+    if(item)showOfficialQnetDetail(item);
+  });
+  $("detailBody").addEventListener("click",e=>{
+    const button=e.target.closest("[data-qnet-day]");
+    if(!button||!isoDate(button.dataset.qnetDay))return;
+    const date=button.dataset.qnetDay;
+    state.selected=date;
+    [state.year,state.month]=date.slice(0,7).split("-").map(Number);
+    showCalendar();
+    $("detailDialog").close();
+    $("calendar").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+}
+initQnetUI();

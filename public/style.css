@@ -19,3 +19,45 @@
 @media(max-width:940px){.frame{display:block}.rail{position:sticky;top:0;height:68px;min-height:0;display:flex;flex-direction:row;align-items:center;justify-content:space-between;z-index:50;padding:9px 20px}.brand-symbol{width:35px;height:35px}.brand-word strong{font-size:17px}.brand-word span{font-size:8px;margin-top:3px}.rail-caption,.rail-bottom{display:none}.side-nav{display:flex;gap:3px;overflow:auto}.side-nav a{padding:8px;font-size:11px}.side-nav a .nav-ico,.nav-dot{display:none}.topbar{height:50px}.intro{padding-top:24px}.number-strip{margin-bottom:38px}.intro-art{min-height:260px}.calendar-layout{grid-template-columns:1fr 340px}.calendar-grid{grid-auto-rows:minmax(50px,6.5vw)}.briefing-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:730px){html{scroll-padding-top:95px}.rail{display:block;height:auto;padding:12px 17px 8px}.brand{justify-content:center;margin-bottom:7px}.brand-symbol{width:28px;height:28px}.brand-word{display:flex;align-items:center;gap:9px}.brand-word strong{font-size:16px}.brand-word span{margin-top:0}.side-nav{justify-content:space-between;gap:4px}.side-nav a{white-space:nowrap;font-size:10px;padding:7px 7px}.side-nav a:nth-child(5){display:none}.topbar{height:43px;padding:0 17px}.crumb{font-size:9px;letter-spacing:1px}.top-actions{gap:6px}.date-stamp{font-size:10px}.official-indicator{display:none}.page-max{padding:0 15px 46px}.intro{padding-top:19px}.intro-serial,.edition{display:none}.intro-layout{grid-template-columns:1fr;margin-top:0;gap:0}.intro-copy{padding:15px 2px 0}.intro-copy h1{font-size:clamp(34px,7.5vw,46px)}.intro-copy>p{font-size:12px;margin:14px 0 19px}.intro-art{display:none}.hero-search{min-height:56px;padding:6px 6px 6px 12px;gap:10px}.hero-search input{font-size:12px}.hero-search button{min-width:90px;padding:12px 11px;font-size:11px}.search-examples{margin-top:9px}.number-strip{grid-template-columns:1fr 1fr;margin:22px 0 38px}.number-item{padding:14px}.number-item:nth-child(2){border-right:0}.number-item:nth-child(-n+2){border-bottom:1px solid var(--line)}.number-item strong{font-size:25px;margin:5px 0}.number-item small{font-size:9px}.number-label{font-size:10px}.section{margin-top:45px}.section-title{align-items:flex-start;margin-bottom:15px}.section-title h2{font-size:24px;margin:7px 0}.section-title p{font-size:11px;line-height:1.6}.source-legend,.section-link{display:none}.calendar-layout,.insight-layout{grid-template-columns:1fr;gap:13px}.calendar-panel{padding:13px}.calendar-grid{grid-auto-rows:minmax(50px,12vw)}.calendar-cell{padding:7px 4px 4px}.cell-num{font-size:11px;width:23px;height:23px}.cell-label{font-size:8px}.calendar-foot{gap:9px}.small-right{display:none}.daily-panel{padding:19px}.daily-date{padding:12px 0 4px}.daily-date>strong{font-size:65px}.daily-panel>h3{margin:15px 0}.upcoming-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}.upcoming-row{min-width:0}.directory-top{padding:15px}.filter-tabs{gap:3px}.filter-tabs button{font-size:10px;padding:8px 9px}.directory-meta{padding:14px}.result-list{padding:4px 14px}.result-row{padding:13px 0;gap:10px}.result-initial{width:39px;height:39px}.result-title{font-size:12px}.result-sub{font-size:10px}.class-tag{font-size:9px;padding:5px}.result-arrow{display:none}.ranking-panel{padding:18px}.rank-tabs{gap:13px}.rank-tabs button{font-size:10px}.briefing-list{grid-template-columns:1fr}.brief-card{min-height:0;padding:20px}.brief-card h3{margin:14px 0 6px}.brief-card .brief-link{padding-top:14px}.source-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.source-grid a{padding:15px}.source-grid b{font-size:14px}.source-section{margin-top:50px}.footer{padding:20px 16px;font-size:9px}.detail-dialog{padding:22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
+
+
+/* Official Q-Net search: editorial hierarchy, one matching national catalogue. */
+.qnet-results{margin:0 24px 5px;padding:19px 18px 14px;border:1px solid #c8dfc5;background:#f7fbf4;border-radius:9px}
+.qnet-results[hidden]{display:none}
+.qnet-head{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #dce9d8;padding-bottom:14px}
+.qnet-eyebrow{display:block;letter-spacing:1.5px;color:#558264;font-size:9px;font-weight:850;margin-bottom:4px}
+.qnet-head h3{font-size:17px;letter-spacing:-.5px;margin:0 0 3px}
+.qnet-head p{font-size:11px;color:#829888;margin:0}
+.qnet-head a{white-space:nowrap;font-size:11px;font-weight:800;color:#477450}
+.qnet-result-count{font-size:10px;color:#7a907c;margin:13px 0 2px}
+.qnet-message{font-size:12px;color:#627866;padding:20px 4px;line-height:1.8}
+.qnet-message a{text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.qnet-result-row{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:15px 4px;border:0;border-bottom:1px solid #e0eade;background:none}
+.qnet-result-row:last-child{border-bottom:0}
+.qnet-result-row:hover{background:#eef7e9}
+.qnet-number{font-size:11px;font-weight:750;letter-spacing:.5px;color:#3e734c;background:#e3f0df;border:1px solid #d1e6ce;padding:8px 11px;border-radius:6px;flex-shrink:0}
+.qnet-result-copy{min-width:0;flex:1}
+.qnet-result-copy strong{display:block;font-size:14px;color:#274531;letter-spacing:-.3px}
+.qnet-result-copy small{display:block;font-size:10px;color:#809384;margin-top:3px}
+.qnet-view{white-space:nowrap;font-size:11px;font-weight:800;color:#487750}
+.qnet-view span{margin-left:10px}
+.qnet-schedule-list{border-top:1px solid #e3eadd;margin-top:15px}
+.qnet-date{display:flex;width:100%;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid #e6ede3;background:#fff;padding:14px 6px}
+.qnet-date:hover{background:#f2f8ef}
+.qnet-date-copy{flex:1;min-width:0}
+.qnet-date-copy strong{display:block;color:#233f2c;font-size:12px}
+.qnet-date-copy small{display:block;color:#859787;font-size:10px;margin-top:4px;line-height:1.6}
+.qnet-date-arrow{color:#628768}
+.qnet-schedule-empty{padding:21px 10px;color:#718675;font-size:12px;line-height:1.9}
+@media(max-width:730px){
+  .qnet-results{margin:0 13px 5px;padding:16px 12px}
+  .qnet-head h3{font-size:15px}
+  .qnet-head p{font-size:10px;line-height:1.5}
+  .qnet-head a{font-size:10px}
+  .qnet-result-row{gap:9px;padding:13px 2px}
+  .qnet-number{font-size:10px;padding:7px}
+  .qnet-result-copy strong{font-size:12px}
+  .qnet-view{font-size:10px}
+  .qnet-view span{display:none}
+  .qnet-date-copy small{font-size:9px}
+}

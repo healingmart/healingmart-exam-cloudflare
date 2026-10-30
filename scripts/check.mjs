@@ -53,3 +53,26 @@ const health=await worker.fetch(new Request("https://test.local/api/health"),ctx
 assert.equal(health.status,200);assert.equal((await health.json()).recordCount,manifest.total);
 assert.equal((await worker.fetch(new Request("https://test.local/api/unknown"),ctx)).status,404);
 console.log("EXAM_CHECK_OK",JSON.stringify({catalog:manifest.total,verifiedSchedule:schedule.events.length,officialBriefs:briefs.length,d1:false}));
+
+
+// Q-Net parser and API input contracts: no raw secret needed for deterministic checks.
+const {parseCatalog,parseOfficialSchedule} = await import("../src/providers/qnet.js");
+const catalogFixture='<response><header><resultCode>00</resultCode></header><body><items><item><jmcd>1150</jmcd><jmfldnm>전기기사</jmfldnm><seriesnm>기사</seriesnm><qualgbnm>국가기술자격</qualgbnm></item></items></body></response>';
+const rows=parseCatalog(catalogFixture);
+assert.equal(rows.length,1,"QNet catalog fixture mismatch");
+assert.equal(rows[0].itemCode,"1150");
+assert.equal(rows[0].name,"전기기사");
+const scheduleFixture='<table><tr><th>2026년 정기 기사 4회</th><td>2026.09.01 ~ 2026.09.04</td><td>2026.09.25 ~ 2026.10.10</td><td>2026.10.28</td><td></td><td></td><td></td></tr></table>';
+const milestones=parseOfficialSchedule(scheduleFixture,"1150",2026);
+assert.equal(milestones.length,3,"QNet milestone extraction mismatch");
+assert.deepEqual(milestones.map(x=>x.type),["apply","exam","announce"]);
+assert.deepEqual(milestones.map(x=>x.date),["2026-09-01","2026-09-25","2026-10-28"]);
+assert.equal(milestones[0].endDate,"2026-09-04");
+const invalid=await worker.fetch(new Request("https://test.local/api/qnet/items?q=a"),ctx);
+assert.equal(invalid.status,400,"invalid query must not call upstream");
+const unavailable=await worker.fetch(new Request("https://test.local/api/qnet/items?q=전기기사"),ctx);
+assert.equal(unavailable.status,503,"missing secret must not be hidden");
+const noKeyLeak=await unavailable.text();
+assert(!noKeyLeak.includes("serviceKey="),"API response leaked credentials");
+assert(file("app.js").includes('initQnetUI()')&&file("index.html").includes('id="qnetResults"'),"QNet frontend integration missing");
+console.log("EXAM_QNET_CHECK_OK",JSON.stringify({sampleItems:rows.length,sampleMilestones:milestones.length,missingCredentialStatus:unavailable.status}));

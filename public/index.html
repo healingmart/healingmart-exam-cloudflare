@@ -84,6 +84,7 @@
           <div class="panel directory-panel">
             <div class="directory-top"><div class="directory-search"><span class="lens small" aria-hidden="true"></span><label class="sr-only" for="directoryInput">자격증 검색</label><input type="search" id="directoryInput" placeholder="자격명 · 기관명 · 등록번호" autocomplete="off"><button type="button" id="clearSearch" aria-label="검색어 지우기">×</button></div><div class="filter-tabs" id="filterTabs" aria-label="자격 종류 선택"><button type="button" data-filter="all" class="selected" aria-pressed="true">전체</button><button type="button" data-filter="national" aria-pressed="false">국가자격</button><button type="button" data-filter="private" aria-pressed="false">등록 민간</button><button type="button" data-filter="accredited" aria-pressed="false">국가공인 민간</button></div></div>
             <div class="directory-meta"><div><strong id="searchTotal">—</strong><span id="searchNotice">검색 준비 중</span></div><span class="data-state" id="dataState">원장 확인 중</span></div>
+            <div id="qnetResults" class="qnet-results" aria-live="polite" hidden></div>
             <div id="resultList" class="result-list" aria-live="polite"></div>
             <div class="result-footer"><button type="button" id="moreResults" hidden>결과 더 보기 <span>↓</span></button><span id="resultPagination"></span></div>
           </div>
