@@ -74,6 +74,11 @@ function applyQuery(value){
 function filtered(){
   const q=normal(state.query);
   let a=state.catalog.filter(r=>(state.filter==="all"||classOf(r)===state.filter)&&(!q||relevant(r).includes(q)));
+  // Hide seed national records when the same official Q-Net item is returned.
+  if(q&&qnetEnabled()&&qnetUI.entries.length){
+    const names=new Set(qnetUI.entries.map(x=>normal(x.name)));
+    a=a.filter(r=>classOf(r)!=="national"||!names.has(normal(r.name)));
+  }
   if(q){
     const weight=r=>{const n=normal(r.name),reg=normal(r.registration);return n===q?0:n.startsWith(q)?1:reg===q?2:n.includes(q)?3:4};
     a=a.sort((x,y)=>weight(x)-weight(y)||x.name.localeCompare(y.name,"ko"));
@@ -86,9 +91,11 @@ function resultCard(r){
 }
 function renderCatalog(){
   const list=filtered(), end=(state.page+1)*state.pageSize;
-  $("searchTotal").textContent=number(list.length)+"개 검색 결과";
+  const officialCount=qnetEnabled()&&normal(state.query).length>=2?qnetUI.entries.length:0;
+  $("searchTotal").textContent=number(list.length+officialCount)+"개 검색 결과";
   $("searchNotice").textContent=state.query?'“'+state.query+'” 검색':'자격명 · 발급기관 · 등록번호 기준';
   $("dataState").textContent=state.manifest.fullCatalog?"공식 원장 데이터":"초기 검증 6종목";
+  $("resultList").hidden=!list.length&&officialCount>0;
   $("resultList").innerHTML=list.length?list.slice(0,end).map(resultCard).join(""):'<div class="directory-empty"><b>검색 결과가 없습니다.</b>다른 자격명이나 기관명으로 검색해보세요.'+(!state.manifest.fullCatalog?'<br>현재는 공식 전체 원장 연결 전입니다.':'')+'</div>';
   $("moreResults").hidden=end>=list.length;
   $("resultPagination").textContent=list.length?number(Math.min(end,list.length))+" / "+number(list.length)+"개":'';
@@ -212,11 +219,11 @@ function showQnetResults(status,msg){
 async function queryQnet(){
   const query=state.query.trim(),current=++qnetUI.requestId;
   if(!qnetEnabled()||normal(query).length<2||normal(query).length>60){
-    qnetUI.entries=[];showQnetResults("empty");return;
+    qnetUI.entries=[];showQnetResults("empty");renderCatalog();return;
   }
   const k=normal(query);
   if(qnetUI.cached.has(k)){
-    qnetUI.entries=qnetUI.cached.get(k);showQnetResults("done");return;
+    qnetUI.entries=qnetUI.cached.get(k);showQnetResults("done");renderCatalog();return;
   }
   qnetUI.entries=[];showQnetResults("loading");
   try{
@@ -226,10 +233,10 @@ async function queryQnet(){
     if(current!==qnetUI.requestId)return;
     qnetUI.entries=data.items.filter(r=>/^[A-Z0-9]{4}$/.test(r.itemCode)&&r.name&&safeUrl(r.officialUrl));
     qnetUI.cached.set(k,qnetUI.entries);
-    showQnetResults("done");
+    showQnetResults("done");renderCatalog();
   }catch(e){
     if(current!==qnetUI.requestId)return;
-    qnetUI.entries=[];showQnetResults("error");
+    qnetUI.entries=[];showQnetResults("error");renderCatalog();
   }
 }
 function enqueueQnet(delay=0){
