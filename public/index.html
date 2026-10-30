@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#14251e">
-  <meta name="description" content="시험을 준비하는 모든 순간. 오늘의 시험, 원서접수, 자격정보, 공식 통계와 소식을 한곳에서 확인하는 HealingMart EXAM.">
-  <title>HealingMart EXAM — 오늘의 시험, 다음의 기회</title>
+  <meta name="theme-color" content="#F8FBFF">
+  <meta name="description" content="국가자격·민간자격·원서접수·시험일·합격 발표까지. 공식 시험 정보를 쉽고 정확하게 찾아보세요.">
+  <title>HealingMart EXAM — 시험 일정과 자격정보</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="/style.css">
@@ -14,101 +14,126 @@
 </head>
 <body>
 <a class="skip" href="#main">본문 바로가기</a>
-<div class="frame">
-  <aside class="rail" aria-label="서비스 탐색">
-    <a class="brand" href="#overview" aria-label="HealingMart EXAM 홈">
-      <span class="brand-symbol"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 4h24a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="2"/><path d="M12 13h16M12 20h9M12 27h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="28" cy="20" r="3" fill="#C8FF81"/></svg></span>
-      <span class="brand-word"><strong>healingmart</strong><span>EXAM ATLAS</span></span>
-    </a>
-    <div class="rail-caption">EXAM INTELLIGENCE</div>
-    <nav class="side-nav">
-      <a href="#overview" data-nav="overview" class="active"><span class="nav-ico">◫</span> 오늘의 시험 <span class="nav-dot"></span></a>
-      <a href="#calendar"><span class="nav-ico">▦</span> 시험 캘린더</a>
-      <a href="#directory"><span class="nav-ico">⌕</span> 시험·자격 검색</a>
-      <a href="#pulse"><span class="nav-ico">▤</span> 시험 데이터</a>
-      <a href="#briefing"><span class="nav-ico">↗</span> 공식 소식</a>
-    </nav>
-    <div class="rail-bottom">
-      <div class="rail-source"><span class="signal"></span><span>OFFICIAL SOURCE FIRST<br><small>확인된 정보만 게시합니다</small></span></div>
-      <a class="rail-main" href="https://healingmart.co.kr/" target="_blank" rel="noopener noreferrer">HEALINGMART <span>↗</span></a>
+<div class="app-shell">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#overview" aria-label="힐링편의점 시험정보 홈">
+        <span class="brand-mark" aria-hidden="true">H<span>·</span></span>
+        <span class="brand-word"><strong>HealingMart</strong><span>EXAM</span></span>
+      </a>
+      <nav class="side-nav" aria-label="주요 메뉴">
+        <a href="#overview" class="active">홈</a>
+        <a href="#calendar">시험 일정</a>
+        <a href="#directory">자격증 검색</a>
+        <a href="#pulse">시험 통계</a>
+        <a href="#briefing">공식 소식</a>
+      </nav>
+      <div class="header-meta"><span class="date-stamp" id="todayStamp">대한민국 표준시</span><span class="header-status"><i></i> 공식 자료 기준</span></div>
     </div>
-  </aside>
-  <div class="content-frame">
-    <header class="topbar">
-      <div class="crumb">HEALINGMART <span>/</span> EXAM <span>/</span> <b>OVERVIEW</b></div>
-      <div class="top-actions"><span class="date-stamp" id="todayStamp">대한민국 표준시</span><span class="official-indicator"><i></i> 검증 데이터</span></div>
-    </header>
-    <main id="main">
-      <div class="page-max">
-        <section class="intro" id="overview">
-          <div class="intro-head"><div class="overline"><span class="tiny-square"></span> THE EXAM DIRECTORY OF KOREA <span class="edition">EDITION 01 / 2026</span></div><span class="intro-serial">01 — OVERVIEW</span></div>
-          <div class="intro-layout">
-            <div class="intro-copy"><h1>다음 기회는<br><span>정확한 날짜</span>에서 시작됩니다.</h1><p>국가시험부터 민간자격까지. 오늘의 일정, 원서접수, 자격정보와 공식 데이터를 한 화면에서 살펴보세요.</p>
-              <div class="hero-search"><span class="lens" aria-hidden="true"></span><label class="sr-only" for="globalSearch">시험 또는 자격증 검색</label><input type="search" id="globalSearch" autocomplete="off" placeholder="시험·자격증·발급기관을 검색하세요"><button type="button" id="heroSearchBtn">시험 찾기 <span>↗</span></button></div>
-              <div class="search-examples">예시 <button data-query="바리스타">바리스타</button><button data-query="전기기사">전기기사</button><button data-query="정보처리기사">정보처리기사</button></div>
+  </header>
+
+  <main id="main">
+    <section class="hero-zone" id="overview">
+      <div class="site-container">
+        <div class="hero-layout">
+          <div class="hero-copy">
+            <p class="hero-eyebrow">시험과 자격정보, 한곳에서</p>
+            <h1>내가 준비하는 시험,<br><span>일정부터 정확하게.</span></h1>
+            <p class="hero-desc">원서접수부터 시험일, 합격 발표까지. 국가자격과 민간자격의 공식 정보를 편안하게 찾아보세요.</p>
+            <div class="hero-search">
+              <span class="lens" aria-hidden="true"></span>
+              <label class="sr-only" for="globalSearch">시험 또는 자격증 검색</label>
+              <input type="search" id="globalSearch" autocomplete="off" placeholder="시험명, 자격증, 기관명 검색">
+              <button type="button" id="heroSearchBtn">검색 <span aria-hidden="true">→</span></button>
             </div>
-            <div class="intro-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-vertical">EXAM<br>DATA<br>VERIFIED</div><div class="art-num" id="heroToday">30</div><div class="art-caption">TODAY<br><span>YOUR NEXT STEP</span></div><div class="art-cross">＋</div><div class="art-hm">H / M</div></div>
+            <div class="search-examples"><span>많이 찾는 검색어</span><button data-query="전기기사">전기기사</button><button data-query="정보처리기사">정보처리기사</button><button data-query="바리스타">바리스타</button></div>
           </div>
-        </section>
-
-        <section class="number-strip" aria-label="서비스 데이터 현황">
-          <div class="number-item"><span class="number-label">공식 등록 민간자격 규모 <a href="https://pqi.or.kr/inf/qul/infQulSitRegView.do" target="_blank" rel="noopener noreferrer" aria-label="공식 통계 출처">↗</a></span><strong>67,236<span>종목</span></strong><small>2026.10.02 기준 공식 현황 · 서비스 수록량 아님</small></div>
-          <div class="number-item"><span class="number-label">현재 검색 데이터</span><strong id="statCatalog">—</strong><small id="catalogNote">수집 단계 확인 중</small></div>
-          <div class="number-item"><span class="number-label">공식 확인 일정</span><strong id="statEvents">—</strong><small>게시된 검증 일정 수</small></div>
-          <div class="number-item"><span class="number-label">정보 기준일</span><strong id="statUpdated">—</strong><small>수집원장·일정 기준일 구분</small></div>
-        </section>
-
-        <section class="section" id="calendar">
-          <div class="section-title"><div><div class="kicker">01 / SCHEDULE</div><h2>오늘의 시험과 일정</h2><p>시험일뿐 아니라 원서접수·합격 발표까지 확인합니다.</p></div><span class="source-legend"><i></i> 출처 확인된 일정만 표기</span></div>
-          <div class="calendar-layout">
-            <div class="panel calendar-panel">
-              <div class="calendar-toolbar"><div class="calendar-month"><h3 id="calTitle">—</h3><span class="tz-pill">KST</span></div><div class="calendar-ctrl"><button type="button" id="calToday" class="cal-today">오늘</button><button type="button" id="calPrev" aria-label="이전 달">←</button><button type="button" id="calNext" aria-label="다음 달">→</button></div></div>
-              <div class="calendar-week" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
-              <div id="calendarGrid" class="calendar-grid" role="grid" aria-label="공식 시험 일정 월간 달력"></div>
-              <div class="calendar-foot"><span><i class="legend-dot exam"></i> 시험</span><span><i class="legend-dot apply"></i> 접수</span><span><i class="legend-dot announce"></i> 발표</span><span class="small-right">날짜를 선택하면 상세 일정 표시</span></div>
-            </div>
-            <div class="panel daily-panel">
-              <div class="daily-kicker">DAILY BRIEFING <span>◌ LIVE DATE</span></div>
-              <div class="daily-date"><strong id="selectedDayNum">—</strong><div><span id="selectedDayWeek">—</span><small id="selectedDayMonth">—</small></div></div>
-              <h3>선택한 날짜의 시험 일정</h3>
-              <div id="dayEventList" class="day-event-list"></div>
-              <div class="daily-divider"></div>
-              <div class="upcoming-title">다가오는 주요 일정 <span>OFFICIAL</span></div>
-              <div id="upcomingEvents" class="upcoming-list"></div>
-            </div>
+          <div class="hero-aside">
+            <div class="today-intro"><span class="today-caption">오늘 날짜</span><span class="today-digit" id="heroToday">30</span><span class="today-unit">일</span></div>
+            <div class="today-support"><strong>시험 준비의 시작은 일정 확인부터</strong><p>공식 발표로 확인된 날짜만 달력에 표시합니다.</p><a href="#calendar">이번 달 일정 보기 <span aria-hidden="true">↗</span></a></div>
           </div>
-        </section>
-
-        <section class="section" id="directory">
-          <div class="section-title"><div><div class="kicker">02 / DISCOVER</div><h2>시험·자격정보 검색</h2><p>동일한 명칭이라도 등록번호와 발급기관이 다르면 별도 자격입니다.</p></div><a class="section-link" href="https://www.pqi.or.kr/inf/qul/infQulList.do" target="_blank" rel="noopener noreferrer">민간자격 공식검색 ↗</a></div>
-          <div class="panel directory-panel">
-            <div class="directory-top"><div class="directory-search"><span class="lens small" aria-hidden="true"></span><label class="sr-only" for="directoryInput">자격증 검색</label><input type="search" id="directoryInput" placeholder="자격명 · 기관명 · 등록번호" autocomplete="off"><button type="button" id="clearSearch" aria-label="검색어 지우기">×</button></div><div class="filter-tabs" id="filterTabs" aria-label="자격 종류 선택"><button type="button" data-filter="all" class="selected" aria-pressed="true">전체</button><button type="button" data-filter="national" aria-pressed="false">국가자격</button><button type="button" data-filter="private" aria-pressed="false">등록 민간</button><button type="button" data-filter="accredited" aria-pressed="false">국가공인 민간</button></div></div>
-            <div class="directory-meta"><div><strong id="searchTotal">—</strong><span id="searchNotice">검색 준비 중</span></div><span class="data-state" id="dataState">원장 확인 중</span></div>
-            <div id="qnetResults" class="qnet-results" aria-live="polite" hidden></div>
-            <div id="resultList" class="result-list" aria-live="polite"></div>
-            <div class="result-footer"><button type="button" id="moreResults" hidden>결과 더 보기 <span>↓</span></button><span id="resultPagination"></span></div>
-          </div>
-        </section>
-
-        <section class="section" id="pulse">
-          <div class="section-title"><div><div class="kicker">03 / EXAM INTELLIGENCE</div><h2>숫자로 읽는 시험</h2><p>인기·응시 규모·합격률 등은 조사연도와 공식 집계가 확인된 경우만 순위로 만듭니다.</p></div><span class="source-legend">산식·출처·기준연도 표시 원칙</span></div>
-          <div class="insight-layout">
-            <div class="panel ranking-panel"><div class="ranking-top"><div><span class="submark">RANKING / DATA SERIES</span><h3>시험 데이터 랭킹</h3></div><span id="rankingYear" class="year-tag">자료 검증 중</span></div><div class="rank-tabs" role="group" aria-label="순위 종류" id="rankTabs"><button data-rank="applicants" class="selected" aria-pressed="true">응시자 많은 시험</button><button data-rank="difficulty" aria-pressed="false">합격률 낮은 시험</button><button data-rank="growth" aria-pressed="false">관심 증가 자격</button></div><div id="rankingContent" class="ranking-content"></div><p class="footnote">※ 합격률은 공식 집계 기준의 값이며, 시험 자체의 체감 난이도와 같지 않습니다. 기준 연도·응시 분모가 다른 시험끼리 무리하게 비교하지 않습니다.</p></div>
-            <div class="panel fact-panel"><div class="submark">DATA INTEGRITY</div><div class="fact-graphic"><div class="fact-ring"><b>✓</b><small>출처 원칙</small></div><div class="fact-cross">✳</div></div><h3>확인하지 않은 수치는<br>보여주지 않습니다.</h3><p>공식기관 발표자료, 조사 기준연도, 원문 링크를 함께 보존해 수치의 신뢰성을 관리합니다.</p><a href="#sources">검증 기준 살펴보기 <span>↗</span></a></div>
-          </div>
-        </section>
-
-        <section class="section" id="briefing"><div class="section-title"><div><div class="kicker">04 / BRIEFING</div><h2>공식 시험 소식</h2><p>시험 제도·시행계획·변경사항을 출처와 게시일로 확인하세요.</p></div><span class="source-legend">보도자료 / 기관 공지</span></div><div id="briefingList" class="briefing-list"></div></section>
-
-        <section class="section source-section" id="sources"><div class="section-title"><div><div class="kicker">05 / TRANSPARENCY</div><h2>데이터 출처와 검증</h2><p>모든 일정은 공식 발표를 우선하며, 인증키 등록 여부와 실제 수집 성공 여부를 구분합니다.</p></div></div>
-          <div class="source-grid"><a href="https://www.q-net.or.kr/" target="_blank" rel="noopener noreferrer"><b>Q-NET <span>↗</span></b><small>국가기술·전문자격</small></a><a href="https://www.pqi.or.kr/" target="_blank" rel="noopener noreferrer"><b>PQI <span>↗</span></b><small>등록·공인 민간자격</small></a><a href="https://www.moe.go.kr/" target="_blank" rel="noopener noreferrer"><b>교육부 <span>↗</span></b><small>수능 및 교육 공고</small></a><a href="https://kosis.kr/" target="_blank" rel="noopener noreferrer"><b>KOSIS <span>↗</span></b><small>공식 통계</small></a></div>
-          <div class="source-alert"><b>정보 이용 전 확인</b><p>자격 등록은 국가공인을 의미하지 않습니다. 시험 일정은 변경될 수 있으므로 접수 전 반드시 원문 공고를 확인하세요. 실제 취업·채용에서의 인정 여부는 해당 기관과 모집공고에 따라 다릅니다.</p></div>
-        </section>
+        </div>
       </div>
-      <footer class="footer"><span>© HEALINGMART EXAM · 정확한 정보로 이어지는 다음 도전.</span><span>DATA FIRST. PEOPLE ALWAYS.</span></footer>
-    </main>
-  </div>
+    </section>
+
+    <div class="site-container">
+      <section class="number-strip" aria-label="데이터 이용 현황">
+        <div class="number-item"><span class="number-label">검색할 수 있는 자격정보</span><strong id="statCatalog">—</strong><small id="catalogNote">공식 데이터 확인 중</small></div>
+        <div class="number-item"><span class="number-label">확인된 주요 일정</span><strong id="statEvents">—</strong><small>검증된 공식 일정</small></div>
+        <div class="number-item"><span class="number-label">민간자격 공식 등록 현황 <a href="https://pqi.or.kr/inf/qul/infQulSitRegView.do" target="_blank" rel="noopener noreferrer" aria-label="공식 통계 출처">↗</a></span><strong>67,236 <span>종목</span></strong><small>2026.10.02 기준 · 검색 수록량과 별개</small></div>
+        <div class="number-item"><span class="number-label">민간자격 데이터 기준일</span><strong id="statUpdated">—</strong><small>원장 자료의 기준일</small></div>
+      </section>
+
+      <section class="section" id="calendar">
+        <div class="section-title"><div><span class="section-index">01</span><h2>시험 캘린더</h2><p>날짜를 선택해 접수, 시험, 발표 일정을 확인하세요.</p></div><span class="source-legend"><i></i> 공식 확인된 일정만 표시</span></div>
+        <div class="calendar-layout">
+          <div class="calendar-panel">
+            <div class="calendar-toolbar">
+              <div class="calendar-month"><h3 id="calTitle">—</h3><span class="tz-pill">한국 시간</span></div>
+              <div class="calendar-ctrl"><button type="button" id="calToday" class="cal-today">오늘</button><button type="button" id="calPrev" aria-label="이전 달">←</button><button type="button" id="calNext" aria-label="다음 달">→</button></div>
+            </div>
+            <div class="calendar-week" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+            <div id="calendarGrid" class="calendar-grid" role="grid" aria-label="공식 시험 일정 월간 달력"></div>
+            <div class="calendar-foot"><span><i class="legend-dot exam"></i> 시험</span><span><i class="legend-dot apply"></i> 원서접수</span><span><i class="legend-dot announce"></i> 발표</span><span class="small-right">날짜 선택 시 오른쪽에 상세정보 표시</span></div>
+          </div>
+          <aside class="daily-panel" aria-label="선택 날짜의 시험정보">
+            <div class="daily-kicker">선택한 날짜 <span>공식 일정 안내</span></div>
+            <div class="daily-date"><strong id="selectedDayNum">—</strong><div><span id="selectedDayWeek">—</span><small id="selectedDayMonth">—</small></div></div>
+            <h3>이날의 시험 일정</h3>
+            <div id="dayEventList" class="day-event-list"></div>
+            <div class="daily-divider"></div>
+            <div class="upcoming-title">다가오는 주요 일정 <span>공식 자료</span></div>
+            <div id="upcomingEvents" class="upcoming-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="directory">
+        <div class="section-title"><div><span class="section-index">02</span><h2>시험·자격증 검색</h2><p>자격명, 등록번호, 발급기관을 기준으로 정확히 구분합니다.</p></div><a class="section-link" href="https://www.pqi.or.kr/" target="_blank" rel="noopener noreferrer">민간자격 공식 원장 ↗</a></div>
+        <div class="directory-panel">
+          <div class="directory-top">
+            <div class="directory-search"><span class="lens small" aria-hidden="true"></span><label class="sr-only" for="directoryInput">자격증 검색</label><input type="search" id="directoryInput" placeholder="자격증 이름이나 기관명 입력" autocomplete="off"><button type="button" id="clearSearch" aria-label="검색어 지우기">×</button></div>
+            <div class="filter-tabs" id="filterTabs" aria-label="자격 종류 선택">
+              <button type="button" data-filter="all" class="selected" aria-pressed="true">전체</button>
+              <button type="button" data-filter="national" aria-pressed="false">국가자격</button>
+              <button type="button" data-filter="private" aria-pressed="false">등록 민간자격</button>
+              <button type="button" data-filter="accredited" aria-pressed="false">국가공인 민간자격</button>
+            </div>
+          </div>
+          <div class="directory-meta"><div><strong id="searchTotal">—</strong><span id="searchNotice">검색 준비 중</span></div><span class="data-state" id="dataState">데이터 확인 중</span></div>
+          <div id="qnetResults" class="qnet-results" aria-live="polite" hidden></div>
+          <div id="resultList" class="result-list" aria-live="polite"></div>
+          <div class="result-footer"><button type="button" id="moreResults" hidden>결과 더 보기 <span>↓</span></button><span id="resultPagination"></span></div>
+        </div>
+      </section>
+
+      <section class="section" id="pulse">
+        <div class="section-title"><div><span class="section-index">03</span><h2>시험 통계</h2><p>공식 집계의 기준 연도와 출처를 확인한 자료만 제공합니다.</p></div></div>
+        <div class="insight-layout">
+          <div class="ranking-panel">
+            <div class="ranking-top"><div><span class="submark">공식 통계 기준</span><h3>시험 데이터 비교</h3></div><span id="rankingYear" class="year-tag">자료 검증 중</span></div>
+            <div class="rank-tabs" role="group" aria-label="순위 종류" id="rankTabs"><button data-rank="applicants" class="selected" aria-pressed="true">응시자 많은 시험</button><button data-rank="difficulty" aria-pressed="false">합격률 낮은 시험</button><button data-rank="growth" aria-pressed="false">관심 증가 자격</button></div>
+            <div id="rankingContent" class="ranking-content"></div>
+            <p class="footnote">※ 합격률은 체감 난이도와 다르며, 연도·산식·모집단이 확인되지 않은 항목은 표시하지 않습니다.</p>
+          </div>
+          <aside class="fact-panel"><span class="fact-label">데이터 원칙</span><h3>정확한 정보만,<br>필요한 만큼.</h3><p>확인되지 않은 순위나 숫자를 임의로 만들지 않습니다. 공식 발표와 기준일을 분명하게 표시합니다.</p><a href="#sources">데이터 출처 확인 <span>↗</span></a></aside>
+        </div>
+      </section>
+
+      <section class="section" id="briefing">
+        <div class="section-title"><div><span class="section-index">04</span><h2>공식 시험 소식</h2><p>최신 제도와 시행계획은 해당 기관의 원문을 함께 제공합니다.</p></div></div>
+        <div id="briefingList" class="briefing-list"></div>
+      </section>
+
+      <section class="section source-section" id="sources">
+        <div class="section-title"><div><span class="section-index">05</span><h2>데이터 출처</h2><p>각 기관의 공식 공고를 우선합니다.</p></div></div>
+        <div class="source-grid"><a href="https://www.q-net.or.kr/" target="_blank" rel="noopener noreferrer"><b>Q-Net <span>↗</span></b><small>국가자격</small></a><a href="https://www.pqi.or.kr/" target="_blank" rel="noopener noreferrer"><b>PQI <span>↗</span></b><small>민간자격</small></a><a href="https://www.moe.go.kr/" target="_blank" rel="noopener noreferrer"><b>교육부 <span>↗</span></b><small>교육·입시</small></a><a href="https://kosis.kr/" target="_blank" rel="noopener noreferrer"><b>KOSIS <span>↗</span></b><small>공식 통계</small></a></div>
+        <div class="source-alert"><b>정보 이용 안내</b><p>민간자격의 등록은 국가공인을 의미하지 않습니다. 응시 전 반드시 주관기관의 최종 시행계획과 접수 공고를 확인해 주세요.</p></div>
+      </section>
+    </div>
+    <footer class="footer"><div class="site-container"><span>© HealingMart EXAM</span><span>시험과 자격정보를 더 쉽고 정확하게.</span></div></footer>
+  </main>
 </div>
-<dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailHeading"><div class="drawer-head"><span class="submark">QUALIFICATION PROFILE</span><button type="button" id="closeDetail" aria-label="닫기">✕</button></div><div id="detailBody"></div></dialog>
+<dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailHeading"><div class="drawer-head"><span class="submark">자격정보 상세</span><button type="button" id="closeDetail" aria-label="닫기">✕</button></div><div id="detailBody"></div></dialog>
 </body>
 </html>
