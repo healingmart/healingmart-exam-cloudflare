@@ -13,5 +13,11 @@
 /style.css
   Cache-Control: public, max-age=60, must-revalidate
 
+/data/index.json
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/data/details/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 /data/*
-  Cache-Control: public, max-age=60, stale-while-revalidate=300
+  Cache-Control: public, max-age=120, stale-while-revalidate=600

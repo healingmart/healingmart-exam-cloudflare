@@ -1,143 +1,178 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt = (n) => Number(n || 0).toLocaleString("ko-KR");
-const todayParts = new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-const part = (n) => todayParts.find((p) => p.type === n)?.value;
-const today = [part("year"),part("month"),part("day")].join("-");
-const state = {items:[],seed:[],manifest:null,events:[],type:"all",q:"",page:0,pageSize:20,selected:null,cache:{},year:Number(part("year")),month:Number(part("month")),day:today};
-const categories = {
-  "국가기술": "국가자격","국가전문":"국가자격","국가자격":"국가자격",
-  "민간등록":"등록 민간자격","민간공인":"국가공인 민간자격"
-};
-const safeUrl = (s) => {try {const u=new URL(s);return ["https:","http:"].includes(u.protocol) ? u.href : null;} catch{return null;}};
-const group = (r) => categories[r.type] || r.type || "기타";
-const norm = (s) => String(s||"").normalize("NFKC").toLowerCase().replace(/\s+/g,"");
-const matchesType = (r) => state.type==="all" || state.type===r.type || (state.type==="국가기술" && group(r)==="국가자격");
-let filteredCache = [];
-function renderStats(){
-  const m=state.manifest||{};
-  const isFull=Boolean(m.fullCatalog && state.items.length > 6);
-  $("statTotal").textContent=fmt(state.items.length);
-  $("statPrivate").textContent=fmt(state.items.filter(x=>group(x)!=="국가자격").length);
-  $("statNational").textContent=fmt(state.items.filter(x=>group(x)==="국가자격").length);
-  $("statSchedule").textContent=fmt(state.events.length);
-  $("statMode").textContent=isFull?"정식 등록원장 기반":"초기 검증 항목 · 전체 수집 전";
-  $("lastSync").textContent="데이터 기준 "+(m.lastSync||"미확인");
+const escapeHtml = (v) => String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const number = v => Number(v||0).toLocaleString("ko-KR");
+const normal = v => String(v||"").normalize("NFKC").toLocaleLowerCase("ko-KR").replace(/\s+/g,"");
+const safeUrl = v => {try{const u=new URL(v);return ["https:","http:"].includes(u.protocol)?u.href:null;}catch{return null;}};
+const isoDate = s => {if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s||"")))return false;const [y,m,d]=s.split("-").map(Number);return new Date(Date.UTC(y,m-1,d)).toISOString().slice(0,10)===s};
+const kstToday = () => {const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());return ["year","month","day"].map(n=>parts.find(p=>p.type===n)?.value).join("-")};
+const dateOf = iso => new Date(iso+"T12:00:00Z");
+const dayLabel = iso => {const [y,m,d]=iso.split("-").map(Number);return ["일","월","화","수","목","금","토"][new Date(Date.UTC(y,m-1,d)).getUTCDay()]};
+const shortDate = iso => iso?.replace(/^(\d{4})-(\d\d)-(\d\d)$/,"$1.$2.$3")||"—";
+const GROUP = {national:"국가자격",private:"등록 민간자격",accredited:"국가공인 민간자격"};
+const state = {today:kstToday(),selected:"",year:0,month:0,events:[],catalog:[],seed:[],manifest:{},query:"",filter:"all",page:0,pageSize:12,ranking:"applicants",rankings:{},briefs:[],details:{},catalogLoading:false};
+state.selected=state.today;[state.year,state.month]=state.today.slice(0,7).split("-").map(Number);
+const json=async path=>{const r=await fetch(path,{cache:"default"});if(!r.ok)throw Error(path+": HTTP "+r.status);return r.json()};
+const classOf=r=>r.type==="민간공인"?"accredited":r.type==="민간등록"?"private":"national";
+const relevant=r=>[r.name,r.agency,r.registration,r.ministry,r.region].map(normal).join("|");
+const officialEvent=e=>e?.status==="verified"&&isoDate(e.date)&&e.title&&e.source&&e.verifiedAt&&isoDate(e.verifiedAt)&&safeUrl(e.url)&&["exam","apply","announce"].includes(e.type);
+const dateOffset=iso=>Math.round((dateOf(iso)-dateOf(state.today))/86400000);
+function initHeader(){
+  const now=state.today;
+  $("todayStamp").textContent=now.replace(/-/g,".")+" ("+dayLabel(now)+")";
+  $("heroToday").textContent=now.slice(8);
 }
-function resultHTML(r){
-  const isPrivate=group(r)!=="국가자격";
-  return `<button class="result-item ${isPrivate?"private":""} ${state.selected===r.id?"selected":""}" data-id="${esc(r.id)}">
-    <span class="result-symbol" aria-hidden="true">${isPrivate?"✳":"▣"}</span>
-    <span class="result-body"><span class="result-name">${esc(r.name)}</span><span class="result-meta">${esc(r.agency||"기관 확인 필요")}<em>·</em>${esc(r.registration||"등록번호 확인 필요")}</span></span>
-    <span class="result-badge ${isPrivate?"private":""}">${esc(group(r))}</span><span class="item-chevron">›</span></button>`;
+function readStats(){
+  const m=state.manifest;
+  $("statCatalog").textContent=number(m.fullCatalog?(m.privateQualifications||0)+(m.nationalQualifications||0):state.catalog.length);
+  $("catalogNote").textContent=m.fullCatalog?"수집·검증된 서비스 검색 데이터":"초기 검증 데이터 · 민간자격 원장 수집 진행 전";
+  $("statEvents").textContent=number(state.events.length);
+  $("statUpdated").textContent=shortDate(m.lastSync||state.today).slice(5);
 }
-function filterResults(){
-  const q=norm(state.q);
-  let list=state.items.filter(r=>matchesType(r)&&(!q||norm([r.name,r.agency,r.registration,r.ministry,r.region].join(" ")).includes(q)));
+function showCalendar(){
+  const y=state.year,m=state.month,first=new Date(Date.UTC(y,m-1,1)).getUTCDay();
+  const last=new Date(Date.UTC(y,m,0)).getUTCDate();
+  $("calTitle").textContent=y+"년 "+m+"월";
+  const perDay=new Map();
+  for(const e of state.events){if(e.date.startsWith(y+"-"+String(m).padStart(2,"0")))perDay.set(e.date,[...(perDay.get(e.date)||[]),e]);}
+  const total=Math.ceil((first+last)/7)*7;
+  let html="";
+  for(let i=0;i<total;i++){
+    const day=i-first+1;
+    if(day<1||day>last){html+='<div class="calendar-cell outside" role="gridcell"></div>';continue;}
+    const iso=y+"-"+String(m).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+    const events=perDay.get(iso)||[];
+    const classes=["calendar-cell",iso===state.selected?"active":"",iso===state.today?"is-today":""].filter(Boolean).join(" ");
+    const dots=events.length?'<span class="cell-dots">'+events.slice(0,3).map(x=>'<i class="'+x.type+'"></i>').join("")+'</span>':"";
+    html+='<button class="'+classes+'" type="button" role="gridcell" data-day="'+iso+'" aria-label="'+iso+' '+events.length+'건의 검증 일정"><span class="cell-num">'+day+'</span>'+dots+(events.length?'<span class="cell-label">'+escapeHtml(events[0].title)+'</span>':"")+'</button>';
+  }
+  $("calendarGrid").innerHTML=html;
+  showDay();
+}
+function eType(e){return {exam:"시험",apply:"원서접수",announce:"결과발표"}[e.type]||"일정"}
+function showDay(){
+  const iso=state.selected;
+  $("selectedDayNum").textContent=iso.slice(8);
+  $("selectedDayWeek").textContent=dayLabel(iso)+"요일";
+  $("selectedDayMonth").textContent=Number(iso.slice(5,7))+"월 "+iso.slice(0,4)+"년";
+  const list=state.events.filter(e=>e.date===iso);
+  $("dayEventList").innerHTML=list.length?list.map(e=>'<div class="day-event"><span class="type-marker '+e.type+'">'+eType(e)+'</span><div><a target="_blank" rel="noopener noreferrer" href="'+escapeHtml(safeUrl(e.url))+'">'+escapeHtml(e.title)+' ↗</a><small>'+escapeHtml(e.source)+' · '+escapeHtml(shortDate(e.verifiedAt))+' 확인</small></div></div>').join(""):'<div class="no-events"><strong>공식 확인 일정이 등록되지 않았습니다.</strong><span>일정이 없다는 뜻은 아닙니다. 주관기관의 최신 공고를 확인하세요.</span></div>';
+  const next=state.events.filter(e=>e.date>=state.today).slice(0,5);
+  $("upcomingEvents").innerHTML=next.length?next.map(e=>'<div class="upcoming-row"><span class="u-day">'+Number(e.date.slice(8))+'</span><span class="u-meta"><b>'+escapeHtml(e.title)+'</b><small>'+escapeHtml(e.date.slice(0,7))+' · '+eType(e)+' · D'+(dateOffset(e.date)>0?"-"+dateOffset(e.date):"-DAY")+'</small></span><a class="u-link" href="'+escapeHtml(safeUrl(e.url))+'" target="_blank" rel="noopener noreferrer" aria-label="'+escapeHtml(e.title)+' 원문 보기">↗</a></div>').join(""):'<div class="no-events">등록된 향후 일정이 없습니다. 공식 검증을 진행 중입니다.</div>';
+}
+function jumpMonth(delta){
+  const dt=new Date(Date.UTC(state.year,state.month-1+delta,1));
+  state.year=dt.getUTCFullYear();state.month=dt.getUTCMonth()+1;
+  const selected=state.year+"-"+String(state.month).padStart(2,"0")+"-01";
+  state.selected=selected;showCalendar();
+}
+function applyQuery(value){
+  state.query=value.trim();state.page=0;$("directoryInput").value=value;$("globalSearch").value=value;
+  renderCatalog();document.querySelector("#directory").scrollIntoView({behavior:"smooth",block:"start"});
+  if(state.manifest.fullCatalog&&state.catalog.length<=state.seed.length)loadCatalog();
+}
+function filtered(){
+  const q=normal(state.query);
+  let a=state.catalog.filter(r=>(state.filter==="all"||classOf(r)===state.filter)&&(!q||relevant(r).includes(q)));
   if(q){
-    const score=(r)=>{const n=norm(r.name),a=norm(r.agency),reg=norm(r.registration);return (n===q?0:n.startsWith(q)?1:reg===q?2:n.includes(q)?3:a.includes(q)?4:5)};
-    list=list.sort((a,b)=>score(a)-score(b)||a.name.localeCompare(b.name,"ko"));
+    const weight=r=>{const n=normal(r.name),reg=normal(r.registration);return n===q?0:n.startsWith(q)?1:reg===q?2:n.includes(q)?3:4};
+    a=a.sort((x,y)=>weight(x)-weight(y)||x.name.localeCompare(y.name,"ko"));
   }
-  return list;
+  return a;
 }
-function renderResults(reset=false){
-  if(reset)state.page=0;
-  filteredCache=filterResults();
-  $("resultCount").textContent=fmt(filteredCache.length)+"개 자격 검색 결과";
-  $("resultHint").textContent=state.manifest?.fullCatalog?"공식 등록원장 기준":"초기 검증 데이터만 표시 중";
-  const end=(state.page+1)*state.pageSize;
-  const content=filteredCache.slice(0,end);
-  $("results").innerHTML=content.length?content.map(resultHTML).join(""):`<div class="empty"><strong>일치하는 항목이 없습니다.</strong>${state.manifest?.fullCatalog?"다른 검색어 또는 발급기관을 시도하세요.":"현재는 소규모 검증 데이터만 제공됩니다. 전체 원장 연결 후 검색 범위가 확대됩니다."}</div>`;
-  $("loadMore").hidden=end>=filteredCache.length;
+function resultCard(r){
+  const type=classOf(r),letter=r.name?.trim()?.slice(0,1)||"·";
+  return '<button type="button" class="result-row '+type+'" data-id="'+escapeHtml(r.id)+'"><span class="result-initial">'+escapeHtml(letter)+'</span><span class="result-copy"><strong class="result-title">'+escapeHtml(r.name)+'</strong><span class="result-sub">'+escapeHtml(r.agency||"기관 확인 필요")+' &nbsp;·&nbsp; '+escapeHtml(r.registration||"등록번호 미확인")+'</span></span><span class="class-tag '+type+'">'+GROUP[type]+'</span><span class="result-arrow">↗</span></button>';
 }
-function advice(r){
-  if(group(r)==="국가자격"){
-    return {plus:"국가자격으로서 관련 법령과 자격체계가 명확한 편입니다. 직무별 활용 가능성을 확인해 보세요.",minus:"응시자격·실기·검정방식·일정이 종목에 따라 다릅니다. 취득 자체가 취업을 보장하지는 않습니다."};
-  }
-  if(r.type==="민간공인"){
-    return {plus:"국가공인 여부와 적용 범위를 공식 자료로 확인할 수 있습니다.",minus:"공인 범위와 유효기간, 채용 분야의 인정 여부를 별도로 확인해야 합니다."};
-  }
-  return {plus:"관심 분야의 학습 목표와 직무 역량을 체계적으로 정리하는 데 참고할 수 있습니다.",minus:"등록 자체는 국가공인을 뜻하지 않습니다. 응시료·검정방식·실제 활용도는 발급기관과 채용처에서 확인해야 합니다."};
+function renderCatalog(){
+  const list=filtered(), end=(state.page+1)*state.pageSize;
+  $("searchTotal").textContent=number(list.length)+"개 검색 결과";
+  $("searchNotice").textContent=state.query?'“'+state.query+'” 검색':'자격명 · 발급기관 · 등록번호 기준';
+  $("dataState").textContent=state.manifest.fullCatalog?"공식 원장 데이터":"초기 검증 6종목";
+  $("resultList").innerHTML=list.length?list.slice(0,end).map(resultCard).join(""):'<div class="directory-empty"><b>검색 결과가 없습니다.</b>다른 자격명이나 기관명으로 검색해보세요.'+(!state.manifest.fullCatalog?'<br>현재는 공식 전체 원장 연결 전입니다.':'')+'</div>';
+  $("moreResults").hidden=end>=list.length;
+  $("resultPagination").textContent=list.length?number(Math.min(end,list.length))+" / "+number(list.length)+"개":'';
 }
-async function selectDetail(id){
-  state.selected=id;
-  const rec=state.items.find(x=>x.id===id);
+async function loadCatalog(){
+  if(!state.manifest.fullCatalog||state.catalogLoading)return;
+  state.catalogLoading=true;
+  $("dataState").textContent="전체 원장 불러오는 중";
+  try {
+    const d=await json("/data/index.json");
+    if(!Array.isArray(d.records))throw Error("Invalid catalog");
+    state.catalog=[...state.seed.filter(x=>classOf(x)==="national"),...d.records];
+    renderCatalog();
+  }catch(err){console.error("CATALOG_INDEX_ERROR",err);$("dataState").textContent="전체 원장 로드 실패";}finally{state.catalogLoading=false}
+}
+async function openDetail(id){
+  const rec=state.catalog.find(r=>r.id===id);
   if(!rec)return;
   let r=rec;
-  if(rec.shard!==undefined && !rec.description){
-    const k=String(rec.shard).padStart(3,"0");
-    if(!state.cache[k]){ try {const resp=await fetch("/data/details/"+k+".json");if(resp.ok)state.cache[k]=await resp.json();}catch{} }
-    r={...rec,...(state.cache[k]?.[rec.id]||{})};
+  if(rec.shard!==undefined&&!rec.description){
+    const shard=String(rec.shard).padStart(3,"0");
+    try{
+      if(!state.details[shard])state.details[shard]=await json("/data/details/"+shard+".json");
+      r={...rec,...(state.details[shard][rec.id]||{})};
+    }catch(err){console.error("DETAIL_LOAD_ERROR",err)}
   }
-  if(state.selected!==id)return;
-  const a=advice(r),link=safeUrl(r.url);
-  const status=r.status||"공식 원문 확인";
-  $("selected-title").textContent="자격증 상세정보";
-  $("detail").innerHTML=`<span class="detail-tag">${esc(group(r))}</span><h4>${esc(r.name)}</h4>
-    <p>${esc(r.description||"직무내용은 공식 출처에서 확인하세요.")}</p>
-    <div class="detail-row"><span>발급·관리기관</span><strong>${esc(r.agency||"확인 필요")}</strong></div>
-    <div class="detail-row"><span>등록·종목번호</span><strong>${esc(r.registration||"확인 필요")}</strong></div>
-    <div class="detail-row"><span>주무부처</span><strong>${esc(r.ministry||"원문 확인")}</strong></div>
-    <div class="detail-row"><span>지역 / 상태</span><strong>${esc((r.region||"전국·미분류")+" / "+status)}</strong></div>
-    <div class="detail-section"><b>활용 관점 · 참고용</b><p>✓ ${esc(a.plus)}</p><p>△ ${esc(a.minus)}</p></div>
-    <div class="detail-section"><b>시험일정 및 응시료</b><p>공식 검증 일정이 등록되면 달력에 표시됩니다. 현재 해당 자격의 일정과 응시료를 확정하지 않습니다.</p></div>
-    ${link?`<a class="official-btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">공식 출처에서 확인 ↗</a>`:""}
-    <p class="muted">출처: ${esc(r.source||"원장")} · ${esc(r.verified||"갱신일 확인 필요")}</p>`;
-  renderResults();
+  const type=classOf(r),isNational=type==="national";
+  const plus=isNational?"국가가 관리하는 자격체계와 응시요건을 공식 자료에서 확인할 수 있습니다.":"자기계발과 특정 직무 학습의 목표를 세우는 참고자료가 될 수 있습니다.";
+  const minus=isNational?"응시자격과 시험 방식이 종목마다 다르며 취득이 취업을 보장하지 않습니다.":"등록 민간자격은 국가공인과 다릅니다. 검정료·갱신·채용 인정 여부를 개별 확인해야 합니다.";
+  const kv=[
+    ["자격 구분",GROUP[type]],["관리·발급기관",r.agency||"공식 출처 확인"],["등록·종목번호",r.registration||"원문 확인"],["자격 등급",r.grade||"원문 확인"],["공인 범위",isNational?"국가자격":r.accreditedScope==="부분공인"?"일부 등급 공인":r.accreditedScope==="공인"?"공인":"등록(공인 아님)"],["주무부처",r.ministry||"원문 확인"],["자격 운영 상태",r.status||"원문 확인"],["최초 등록일",r.registeredAt||"원문 확인"],["자료 기준일",r.verified||state.manifest.lastSync||"확인 전"]
+  ];
+  $("detailBody").innerHTML='<span class="class-tag '+type+'">'+GROUP[type]+'</span><h2 id="detailHeading">'+escapeHtml(r.name)+'</h2><p class="detail-lead">'+escapeHtml(r.description||"공식 자격정보 원장에서 직무내용과 응시자격을 확인할 수 있습니다.")+'</p><div class="detail-label">IDENTITY & SOURCE</div>'+kv.map(([a,b])=>'<div class="detail-row"><span>'+escapeHtml(a)+'</span><b>'+escapeHtml(b)+'</b></div>').join("")+'<div class="detail-advice"><b>활용 관점</b><p>＋ '+escapeHtml(plus)+'</p><b>확인해야 할 점</b><p>— '+escapeHtml(minus)+'</p></div><div class="detail-label">EXAM SCHEDULE</div><p class="detail-lead">이 자격의 공식 검증된 접수·시험·발표 일정만 달력에 표시합니다. 응시료와 합격률은 출처 확인 후 추가됩니다.</p>'+(safeUrl(r.url)?'<a class="detail-source" href="'+escapeHtml(safeUrl(r.url))+'" target="_blank" rel="noopener noreferrer">공식 원문 확인 ↗</a>':'')+'<p class="detail-notice">※ 실무 활용도 및 장단점은 일반적인 참고사항이며, 법적 효력과 취업 가능성을 보증하지 않습니다.</p>';
+  $("detailDialog").showModal();
 }
-function renderMonth(){
-  const y=state.year,m=state.month;
-  $("monthTitle").textContent=y+"년 "+m+"월";
-  const first=new Date(Date.UTC(y,m-1,1)).getUTCDay();
-  const days=new Date(Date.UTC(y,m,0)).getUTCDate();
-  const monthStr=String(m).padStart(2,"0");
-  const eventDays=new Set(state.events.map(e=>String(e.date||"").slice(0,10)));
-  let html="";
-  for(let i=0;i<first;i++)html+='<span class="month-day outside"></span>';
-  for(let day=1;day<=days;day++){
-    const date=y+"-"+monthStr+"-"+String(day).padStart(2,"0");
-    html+=`<button type="button" class="month-day ${date===today?"today":""} ${date===state.day?"selected":""} ${eventDays.has(date)?"has-event":""}" data-date="${date}" aria-label="${date}">${day}</button>`;
+function showRank(){
+  const r=state.rankings[state.ranking];
+  const rows=Array.isArray(r?.rows)?r.rows.filter(x=>x.name&&Number.isFinite(x.value)&&x.value>=0&&safeUrl(x.sourceUrl)&&r.year):[];
+  $("rankingYear").textContent=rows.length?String(r.year)+"년 기준":"자료 검증 중";
+  if(!rows.length){
+    $("rankingContent").innerHTML='<div class="ranking-pending"><div class="pending-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><strong>공식 통계 연결을 준비하고 있습니다.</strong><p>데이터가 확보되면 조사연도·모집단·출처를 함께 확인할 수 있습니다.<br>임의의 순위나 합격률은 게시하지 않습니다.</p></div>';return;
   }
-  $("monthGrid").innerHTML=html;
-  renderDateEvents();
+  const max=Math.max(1,...rows.map(x=>x.value));
+  $("rankingContent").innerHTML=rows.slice(0,6).map((x,i)=>'<a class="rank-entry" href="'+escapeHtml(safeUrl(x.sourceUrl))+'" target="_blank" rel="noopener noreferrer"><span class="rank-index">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(x.name)+'</strong><span class="rank-bar"><i style="width:'+Math.max(1,Math.min(100,100*x.value/max))+'%"></i></span><b>'+number(x.value)+(r.unit||"")+'</b></a>').join("");
 }
-function renderDateEvents(){
-  const day=state.day||today;
-  const events=state.events.filter(x=>String(x.date).slice(0,10)===day);
-  $("dateEvents").innerHTML=`<strong>${esc(day)}</strong>`+(events.length?events.map(e=>`<div class="event-line">${esc(e.title)} ${safeUrl(e.url)?`<a target="_blank" rel="noopener noreferrer" href="${esc(safeUrl(e.url))}">공식 확인 ↗</a>`:""}</div>`).join(""):'<p>공식 확인된 시험 일정이 없습니다.</p>');
+function showBriefing(){
+  const articles=state.briefs.filter(a=>a.title&&a.source&&isoDate(a.published)&&safeUrl(a.url));
+  $("briefingList").innerHTML=articles.length?articles.slice(0,6).map(a=>'<a class="brief-card" href="'+escapeHtml(safeUrl(a.url))+'" target="_blank" rel="noopener noreferrer"><div class="brief-top"><span class="brief-source">'+escapeHtml(a.source)+'</span><span>'+escapeHtml(shortDate(a.published))+'</span></div><h3>'+escapeHtml(a.title)+'</h3><p>'+escapeHtml(a.summary||"공식 발표 원문을 확인하세요.")+'</p><span class="brief-link">공식 원문 읽기 ↗</span></a>').join(""):'<div class="brief-empty">검증된 공식 소식을 준비하고 있습니다. 제목과 날짜를 임의로 만들지 않습니다.</div>';
 }
-function attach(){
-  let timer;
-  $("searchInput").addEventListener("input",(e)=>{clearTimeout(timer);timer=setTimeout(()=>{state.q=e.target.value.trim();renderResults(true);},180);});
-  $("searchButton").addEventListener("click",()=>{state.q=$("searchInput").value.trim();renderResults(true);$("explore").scrollIntoView({behavior:"smooth"});});
-  $("searchInput").addEventListener("keydown",(e)=>{if(e.key==="Enter")$("searchButton").click();});
-  document.querySelectorAll("[data-search]").forEach(b=>b.addEventListener("click",()=>{$("searchInput").value=b.dataset.search;state.q=b.dataset.search;renderResults(true);$("explore").scrollIntoView({behavior:"smooth"});}));
-  $("tabs").addEventListener("click",(e)=>{const b=e.target.closest("[data-type]");if(!b)return;state.type=b.dataset.type;document.querySelectorAll("[data-type]").forEach(x=>{const active=x===b;x.classList.toggle("active",active);x.setAttribute("aria-pressed",String(active))});renderResults(true);});
-  $("resetButton").addEventListener("click",()=>{$("searchInput").value="";state.q="";state.type="all";document.querySelector('[data-type="all"]').click();renderResults(true);});
-  $("results").addEventListener("click",(e)=>{const b=e.target.closest("[data-id]");if(!b)return;selectDetail(b.dataset.id);if(window.innerWidth<851)document.querySelector(".side-stack").scrollIntoView({behavior:"smooth",block:"start"});});
-  $("loadMore").addEventListener("click",()=>{state.page++;renderResults();});
-  $("prevMonth").addEventListener("click",()=>{state.month--;if(state.month<1){state.month=12;state.year--;}state.day=`${state.year}-${String(state.month).padStart(2,"0")}-01`;renderMonth();});
-  $("nextMonth").addEventListener("click",()=>{state.month++;if(state.month>12){state.month=1;state.year++;}state.day=`${state.year}-${String(state.month).padStart(2,"0")}-01`;renderMonth();});
-  $("monthGrid").addEventListener("click",(e)=>{const b=e.target.closest("[data-date]");if(b){state.day=b.dataset.date;renderMonth();}});
+function setup(){
+  initHeader();
+  $("calPrev").onclick=()=>jumpMonth(-1);
+  $("calNext").onclick=()=>jumpMonth(1);
+  $("calToday").onclick=()=>{state.selected=state.today;[state.year,state.month]=state.today.slice(0,7).split("-").map(Number);showCalendar()};
+  $("calendarGrid").addEventListener("click",e=>{const b=e.target.closest("[data-day]");if(b){state.selected=b.dataset.day;showCalendar()}});
+  $("heroSearchBtn").onclick=()=>applyQuery($("globalSearch").value);
+  $("globalSearch").addEventListener("keydown",e=>{if(e.key==="Enter")applyQuery(e.target.value)});
+  document.querySelectorAll("[data-query]").forEach(b=>b.onclick=()=>applyQuery(b.dataset.query));
+  let searchTimer;
+  $("directoryInput").addEventListener("input",e=>{const q=e.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{state.query=q.trim();state.page=0;renderCatalog();if(state.manifest.fullCatalog&&state.catalog.length<=state.seed.length)loadCatalog()},170)});
+  $("directoryInput").addEventListener("focus",()=>{if(state.manifest.fullCatalog&&state.catalog.length<=state.seed.length)loadCatalog()});
+  $("clearSearch").onclick=()=>{state.query="";$("directoryInput").value="";$("globalSearch").value="";renderCatalog()};
+  $("filterTabs").addEventListener("click",e=>{const b=e.target.closest("[data-filter]");if(!b)return;state.filter=b.dataset.filter;state.page=0;document.querySelectorAll("[data-filter]").forEach(x=>{x.classList.toggle("selected",x===b);x.setAttribute("aria-pressed",String(x===b))});renderCatalog()});
+  $("resultList").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b)openDetail(b.dataset.id)});
+  $("moreResults").onclick=()=>{state.page++;renderCatalog()};
+  $("rankTabs").addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;state.ranking=b.dataset.rank;document.querySelectorAll("[data-rank]").forEach(x=>{x.classList.toggle("selected",x===b);x.setAttribute("aria-pressed",String(x===b))});showRank()});
+  $("closeDetail").onclick=()=>$("detailDialog").close();
+  $("detailDialog").addEventListener("click",e=>{if(e.target===$("detailDialog"))$("detailDialog").close()});
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(entries=>{entries.forEach(ent=>{if(ent.isIntersecting){document.querySelectorAll(".side-nav a").forEach(x=>x.classList.toggle("active",x.hash==="#"+ent.target.id))}})},{threshold:.24});document.querySelectorAll("section[id]").forEach(s=>io.observe(s))}
 }
-async function getJson(path){const r=await fetch(path,{cache:"no-cache"});if(!r.ok)throw new Error(path+": "+r.status);return r.json();}
-async function init(){
-  attach();renderMonth();
-  try {
-    const [seed,manifest,schedule]=await Promise.all([getJson("/data/seed.json"),getJson("/data/manifest.json"),getJson("/data/schedule.json")]);
-    state.seed=seed;state.items=seed;state.manifest=manifest;state.events=Array.isArray(schedule.events)?schedule.events.filter(e=>/^\d{4}-\d{2}-\d{2}$/.test(String(e.date||""))):[];
-    renderStats();renderResults();
-    if(seed.length)await selectDetail(seed[0].id);
-    if(manifest.fullCatalog){
-      const catalog=await getJson("/data/index.json");
-      if(!Array.isArray(catalog.records))throw new Error("Invalid qualification index");
-      const national=seed.filter(x=>group(x)==="국가자격");
-      state.items=[...national,...catalog.records];renderStats();renderResults(true);
-    }
-  }catch(error){
-    console.error("EXAM_LOAD_FAILED",error);
-    $("results").innerHTML='<div class="empty"><strong>정보를 불러오지 못했습니다.</strong>네트워크를 확인하고 새로고침하세요.</div>';
+async function main(){
+  setup();showCalendar();showRank();showBriefing();
+  try{
+    const [manifest,seed,dates,ranks,briefs]=await Promise.all([json("/data/manifest.json"),json("/data/seed.json"),json("/data/schedule.json"),json("/data/rankings.json"),json("/data/briefs.json")]);
+    if(!Array.isArray(seed)||typeof manifest.fullCatalog!=="boolean")throw Error("Invalid manifest");
+    state.manifest=manifest;state.seed=seed;state.catalog=seed;
+    state.events=(dates.events||[]).filter(officialEvent).sort((a,b)=>a.date.localeCompare(b.date));
+    state.rankings=ranks||{};state.briefs=Array.isArray(briefs)?briefs:[];
+    readStats();showCalendar();renderCatalog();showRank();showBriefing();
+    if(location.hash==="#directory"&&state.manifest.fullCatalog)loadCatalog();
+  }catch(err){
+    console.error("EXAM_BOOTSTRAP_FAILED",err);
+    $("resultList").innerHTML='<div class="directory-empty"><b>데이터 연결을 확인하고 있습니다.</b>잠시 후 다시 시도하거나 공식기관 원문을 확인해 주세요.</div>';
+    $("dataState").textContent="연결 오류";
   }
 }
-init();
+main();

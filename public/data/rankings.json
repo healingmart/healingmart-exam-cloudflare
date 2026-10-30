@@ -1,0 +1,20 @@
+{
+  "applicants": {
+    "year": null,
+    "unit": "명",
+    "rows": [],
+    "note": "국가·민간별 응시자 집계범위 통일 전까지 순위 비공개"
+  },
+  "difficulty": {
+    "year": null,
+    "unit": "%",
+    "rows": [],
+    "note": "시험별 최종 합격률의 분모와 연도 확인 전까지 비공개"
+  },
+  "growth": {
+    "year": null,
+    "unit": "%",
+    "rows": [],
+    "note": "관심 증가율의 일관된 기준·조사기간 검증 전까지 비공개"
+  }
+}

@@ -1,5 +1,30 @@
 {
-  "updatedAt": null,
-  "events": [],
-  "note": "등록번호·종목별 공식 접수/시험/발표 날짜를 검증한 항목만 저장합니다. 추정 일정은 노출하지 않습니다."
+  "updatedAt": "2026-10-30",
+  "note": "일정은 교육부 및 교육청 공식 발표에서 날짜·유형·출처를 확인한 경우에만 수록. 확인되지 않은 시험을 없다고 단정하지 않음.",
+  "events": [
+    {
+      "id": "moe-2027-csat-exam",
+      "date": "2026-11-19",
+      "type": "exam",
+      "category": "입시·학력",
+      "examId": "csat-2027",
+      "title": "2027학년도 대학수학능력시험",
+      "source": "교육부",
+      "url": "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=100526&lev=0&m=020402",
+      "verifiedAt": "2026-10-30",
+      "status": "verified"
+    },
+    {
+      "id": "moe-2027-csat-result",
+      "date": "2026-12-11",
+      "type": "announce",
+      "category": "입시·학력",
+      "examId": "csat-2027",
+      "title": "2027학년도 대학수학능력시험 성적 통지",
+      "source": "교육부",
+      "url": "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=100526&lev=0&m=020402",
+      "verifiedAt": "2026-10-30",
+      "status": "verified"
+    }
+  ]
 }

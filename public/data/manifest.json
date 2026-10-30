@@ -1,10 +1,1 @@
-{
-  "mode": "seed",
-  "total": 6,
-  "publicQualifications": 4,
-  "nationalQualifications": 2,
-  "lastSync": "2026-10-30",
-  "source": "PQI/Q-Net official pages",
-  "fullCatalog": false,
-  "scheduleCount": 0
-}
+{"mode":"pqi-csv","fullCatalog":true,"total":65053,"privateQualifications":65051,"nationalQualifications":2,"lastSync":"2026-06-30","sourceAsOf":"2026-06-30","source":"KRIVET/PQI official registered qualifications CSV","scheduleCount":2,"officialPrivateTotal":67236,"officialPrivateAsOf":"2026-10-02","officialPrivateSource":"https://pqi.or.kr/inf/qul/infQulSitRegView.do","csvSha256":"e0546031abb7e2f2ffa0b83e4021f618b4a9314eb027a932ff1d299401d5f2fd","importedRows":87478,"statusCounts":{"registered":65051,"closed":22414,"canceled":13,"other":0,"invalid":0,"duplicates":0}}
