@@ -33,3 +33,12 @@ if(manifest.fullCatalog){
   }
 }
 console.log("EXAM_CHECK_OK",JSON.stringify({seed:seed.length,fullCatalog:manifest.fullCatalog,events:schedule.events.length}));
+
+const worker = (await import("../src/worker.js")).default;
+const stub = { ASSETS: { fetch: async () => new Response(JSON.stringify(manifest)) } };
+const health = await worker.fetch(new Request("https://example.org/api/health"), stub);
+assert.equal(health.status, 200, "health API failed");
+assert.equal((await health.json()).recordCount, manifest.total, "health manifest mismatch");
+assert.equal((await worker.fetch(new Request("https://example.org/api/missing"), stub)).status, 404);
+assert.equal((await worker.fetch(new Request("https://example.org/api/health", { method: "POST" }), stub)).status, 405);
+console.log("EXAM_API_CHECK_OK");

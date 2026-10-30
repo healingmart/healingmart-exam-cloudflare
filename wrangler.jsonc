@@ -1,11 +1,18 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "healingmart-exam-cloudflare",
-  "compatibility_date": "2026-10-28",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-29",
   "workers_dev": true,
   "assets": {
     "directory": "./public",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": [
+      "/api/*"
+    ]
   },
-  "observability": { "enabled": true }
+  "observability": {
+    "enabled": true
+  }
 }
