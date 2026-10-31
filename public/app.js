@@ -49,12 +49,17 @@ function showCalendar(){
     const counts={apply:active.filter(e=>e.type==="apply").length,exam:active.filter(e=>e.type==="exam").length,announce:active.filter(e=>e.type==="announce").length};
     const major=active.some(e=>e.type==="apply")?"apply":active.some(e=>e.type==="exam")?"exam":"announce";
     const classes=["calendar-cell",iso===state.selected?"active":"",iso===state.today?"is-today":"",active.length?"has-events has-"+major:""].filter(Boolean).join(" ");
-    const chips=[["apply","접수"],["exam","시험"],["announce","발표"]].filter(([type])=>counts[type]>0);
-    const flags=chips.map(([type,label])=>'<span class="date-flag '+type+'">'+label+(counts[type]>1?'<b>'+counts[type]+'</b>':"")+'</span>').join("");
-    const marker=active.length?active.find(e=>e.type===major)||active[0]:null;
-    const caption=marker?eType(marker)+" · "+(marker.date===iso?"시작":eventEnd(marker)===iso?"종료":"기간 중"):"";
-    const aria=iso+" "+(active.length?active.length+"건 일정 · "+caption:"검증 일정 미등록");
-    html+='<button class="'+classes+'" type="button" role="gridcell" data-day="'+iso+'" aria-label="'+escapeHtml(aria)+'"><span class="cell-num">'+day+'</span>'+(active.length?'<span class="date-flags">'+flags+'</span><span class="cell-label">'+escapeHtml(caption)+'</span>':"")+'</button>';
+    // Highlight official milestones rather than repeating the same event every day.
+    const milestones=active.filter(e=>e.date===iso||eventEnd(e)===iso).slice(0,2);
+    const flags=milestones.map(e=>{
+      const label=e.date===eventEnd(e)?eType(e):(e.date===iso?eType(e)+" 시작":eType(e)+" 종료");
+      const short={exam:"시험",apply:"접수",announce:"발표"}[e.type]||"일정";
+      return '<span class="date-flag '+e.type+'" title="'+escapeHtml(e.title)+'"><span class="milestone-long">'+escapeHtml(label)+'</span><span class="milestone-short" aria-hidden="true">'+escapeHtml(short)+'</span></span>';
+    }).join("");
+    const ongoing=active.length&&!milestones.length?'<span class="calendar-ongoing" aria-hidden="true"></span>':"";
+    const detail=milestones.length?milestones[0].title:(active.length?"진행 중":"검증 일정 미등록");
+    const aria=iso+" "+(active.length?active.length+"건 일정 · "+detail:"검증 일정 미등록");
+    html+='<button class="'+classes+'" type="button" role="gridcell" data-day="'+iso+'" aria-label="'+escapeHtml(aria)+'"><span class="cell-num">'+day+'</span>'+(active.length?'<span class="date-flags">'+flags+'</span>'+ongoing:"")+'</button>';
   }
   $("calendarGrid").innerHTML=html;
   showDay();
