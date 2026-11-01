@@ -197,3 +197,5 @@
  .exam-outlook-two{grid-template-columns:1fr}
  .exam-svg-label,.exam-svg-year{font-size:12px}
 }
+
+.exam-loading{margin:0;padding:clamp(24px,2vw,46px);font-size:clamp(13px,1vw,20px);font-weight:650;color:var(--ux-muted)}

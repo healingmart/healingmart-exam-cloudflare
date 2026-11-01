@@ -4,7 +4,7 @@ const host=document.getElementById("examSpotlight"), picks=document.getElementBy
 const E=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const date=s=>s?String(s).replaceAll("-","."):"—", n=v=>Number(v||0).toLocaleString("ko-KR");
 const day=s=>new Date(s+"T12:00:00+09:00");
-let exams=[], active=null,tab="overview",selectedStage=0,checked=new Set(),lastQuery="";
+let exams=[], active=null,tab="overview",selectedStage=0,checked=new Set(),lastQuery="",pendingSelection=null;
 function phaseStatus(p,today){
   if(p.start>today)return "예정";
   if(p.end<today)return "종료";
@@ -95,7 +95,7 @@ function open(ex,scroll=true){
  if(scroll)host.scrollIntoView({behavior:'smooth',block:'start'});
  return true;
 }
-function byId(id,scroll=true){const ex=exams.find(e=>e.id===id);return ex?open(ex,scroll):false}
+function byId(id,scroll=true){const ex=exams.find(e=>e.id===id);if(ex)return open(ex,scroll);pendingSelection={id,scroll};host.hidden=false;host.innerHTML='<p class="exam-loading">확인된 시험정보를 불러오고 있습니다.</p>';if(scroll)host.scrollIntoView({behavior:'smooth',block:'start'});return true;}
 function byQuery(q,scroll=false){lastQuery=q;const ex=findExam(q);if(!ex){active=null;host.hidden=true;return false;}open(ex,scroll);return true}
 window.EXAM_FOCUS={
  query:q=>byQuery(q,false),
@@ -110,5 +110,5 @@ host.addEventListener('click',e=>{
 host.addEventListener('change',e=>{if(e.target.matches('[data-check]')){const i=Number(e.target.dataset.check);if(e.target.checked)checked.add(i);else checked.delete(i);}});
 document.getElementById('directoryInput')?.addEventListener('input',e=>byQuery(e.target.value,false));
 document.querySelectorAll('[data-query]').forEach(b=>b.addEventListener('click',()=>{const ex=findExam(b.dataset.query);if(ex)open(ex,true)}));
-fetch('/data/featured-exams.json').then(r=>{if(!r.ok)throw Error('featured');return r.json()}).then(d=>{exams=d.exams||[];if(lastQuery)byQuery(lastQuery,false);const search=state.query||new URLSearchParams(location.search).get('exam');if(search)byQuery(search,false);}).catch(err=>console.error('EXAM_FOCUS_DATA_UNAVAILABLE',err));
+fetch('/data/featured-exams.json').then(r=>{if(!r.ok)throw Error('featured');return r.json()}).then(d=>{exams=d.exams||[];if(pendingSelection){const saved=pendingSelection;pendingSelection=null;byId(saved.id,saved.scroll);}else if(lastQuery)byQuery(lastQuery,false);const search=state.query||new URLSearchParams(location.search).get('exam');if(search)byQuery(search,false);}).catch(err=>{console.error('EXAM_FOCUS_DATA_UNAVAILABLE',err);if(pendingSelection){host.hidden=false;host.innerHTML='<p class="exam-loading">정보 로딩에 실패했습니다. 공식 Q-Net에서 일정을 확인해 주세요.</p>';}});
 })();
