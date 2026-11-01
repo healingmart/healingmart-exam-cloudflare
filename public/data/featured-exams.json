@@ -1,0 +1,189 @@
+{
+  "version": "2026-11-01",
+  "method": "큐넷 종목별 시험일정, 큐넷 시험통계자료 공지 및 한국산업인력공단 통계를 인용한 2026년 사업보고서 확인. 차수별 모수 구분. 추정 합격률·미확정 일자는 미게시.",
+  "exams": [
+    {
+      "id": "realtor",
+      "title": "공인중개사",
+      "category": "국가전문자격",
+      "aliases": [
+        "공인중개사",
+        "중개사",
+        "중개사 시험"
+      ],
+      "round": "2026년 제37회",
+      "agency": "한국산업인력공단(Q-Net)",
+      "qnetCode": "9630",
+      "qualification": "일반적으로 학력·경력 제한 없이 응시할 수 있으나 부정행위 제재, 자격취소 등 법령상 예외는 공식 응시자격 확인",
+      "qualificationSource": "https://www.q-net.or.kr/crf005.do?gId=08&gSite=L&id=crf00503s02&jmCd=9630&jmInfoDivCcd=B0&jmNm=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC",
+      "officialUrl": "https://www.q-net.or.kr/site/junggae",
+      "scheduleSource": "https://www.q-net.or.kr/crf005.do?gId=08&gSite=L&id=crf00503s02&jmCd=9630&jmInfoDivCcd=B0&jmNm=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC",
+      "phases": [
+        {
+          "key": "apply",
+          "label": "정기 원서접수",
+          "start": "2026-08-03",
+          "end": "2026-08-07",
+          "note": "접수 첫날 09:00 ~ 마지막 날 18:00"
+        },
+        {
+          "key": "extra",
+          "label": "빈자리 추가접수",
+          "start": "2026-10-01",
+          "end": "2026-10-02",
+          "note": "잔여 좌석 여부에 따라 달라짐"
+        },
+        {
+          "key": "exam",
+          "label": "1·2차 시험",
+          "start": "2026-10-31",
+          "end": "2026-10-31",
+          "note": "같은 날 시행"
+        },
+        {
+          "key": "answer",
+          "label": "가답안·의견제시",
+          "start": "2026-10-31",
+          "end": "2026-11-06",
+          "note": "의견제시 기간"
+        },
+        {
+          "key": "announce",
+          "label": "합격자 발표",
+          "start": "2026-12-02",
+          "end": "2027-01-31",
+          "note": "공식 게시기간·첫날 확인 권장"
+        }
+      ],
+      "stat": {
+        "basis": "공인중개사 2차 시험 실제 응시인원",
+        "year": 2025,
+        "unit": "명",
+        "points": [
+          {
+            "year": 2021,
+            "applicants": 152041,
+            "participants": 92569,
+            "passed": 26915
+          },
+          {
+            "year": 2022,
+            "applicants": 149059,
+            "participants": 88378,
+            "passed": 27916
+          },
+          {
+            "year": 2023,
+            "applicants": 108022,
+            "participants": 65705,
+            "passed": 15157
+          },
+          {
+            "year": 2024,
+            "applicants": 80533,
+            "participants": 49521,
+            "passed": 15301
+          },
+          {
+            "year": 2025,
+            "applicants": 58162,
+            "participants": 33247,
+            "passed": 10686
+          }
+        ],
+        "sourceType": "한국산업인력공단 수치 재인용(상장사 공시), Q-Net 원자료 별도 공개",
+        "sourceUrl": "https://kind.krx.co.kr/external/2026/03/19/000720/20260319003224/11011.htm",
+        "officialStatsUrl": "https://www.q-net.or.kr/cst003.do?artlSeq=5218525&boardId=Q008&gId=08&gSite=L&id=cst00302"
+      },
+      "prospect": {
+        "headline": "응시자 감소와 직업 전망은 별개의 지표입니다",
+        "description": "2차 실제 응시인원은 2021년부터 2025년까지 감소했습니다. 그러나 이 숫자만으로 중개업 수익성·신규 창업 수요·채용 전망을 단정할 수 없습니다. 지역 부동산 거래량, 개업·폐업 통계, 고용자료를 함께 확인해야 합니다.",
+        "career": "부동산 중개사무소 개설·중개업무 등 법령상 자격 활용. 등록·실무교육 등 별도 요건 확인 필요.",
+        "trendLabel": "2차 실제 응시자 추이"
+      },
+      "application": {
+        "intro": "Q-Net 공인중개사 공식 사이트에서 본인이 직접 원서를 접수합니다. 접수 대행 및 자동 제출을 제공하지 않습니다.",
+        "steps": [
+          "공식 공고에서 해당 회차, 응시자격 및 접수기간 확인",
+          "Q-Net 회원 로그인과 기본정보·사진 등록 상태 확인",
+          "공인중개사 1차·2차 응시 구분 및 지역·시험장 선택",
+          "신청내용과 결제금액을 확인하고 접수 절차 완료",
+          "마이페이지에서 접수 완료 여부와 수험표·응시 장소 재확인"
+        ],
+        "photoNote": "Q-Net FAQ: 최근 6개월 이내 여권용 사진, JPG/JPEG 등의 규격 안내가 있으므로 공식 최신 안내를 확인하세요.",
+        "photoSource": "https://q-net.or.kr/cst002.do?artlSeq=1000800&gId=08&gSite=L&id=cst00202"
+      }
+    },
+    {
+      "id": "tax-accountant",
+      "title": "세무사",
+      "category": "국가전문자격",
+      "aliases": [
+        "세무사",
+        "세무사 시험"
+      ],
+      "round": "2026년 제63회",
+      "agency": "한국산업인력공단(Q-Net)",
+      "qnetCode": "9641",
+      "qualification": "세무사법상 결격사유·응시제한 등 법정 응시 요건 확인 필요",
+      "qualificationSource": "https://www.q-net.or.kr/crf005.do?id=crf00503s02&jmCd=9641&jmInfoDivCcd=B0",
+      "officialUrl": "https://www.q-net.or.kr/crf005.do?id=crf00503s02&jmCd=9641&jmInfoDivCcd=B0",
+      "scheduleSource": "https://www.q-net.or.kr/crf005.do?id=crf00503s02&jmCd=9641&jmInfoDivCcd=B0",
+      "phases": [
+        {
+          "key": "apply",
+          "label": "1차 원서접수",
+          "start": "2026-03-23",
+          "end": "2026-03-27"
+        },
+        {
+          "key": "exam",
+          "label": "1차 시험",
+          "start": "2026-04-25",
+          "end": "2026-04-25"
+        },
+        {
+          "key": "announce",
+          "label": "1차 합격 발표",
+          "start": "2026-05-27",
+          "end": "2026-07-25"
+        },
+        {
+          "key": "apply",
+          "label": "2차 원서접수",
+          "start": "2026-06-15",
+          "end": "2026-06-19"
+        },
+        {
+          "key": "exam",
+          "label": "2차 시험",
+          "start": "2026-07-18",
+          "end": "2026-07-18"
+        },
+        {
+          "key": "announce",
+          "label": "2차 합격 발표",
+          "start": "2026-10-28",
+          "end": "2026-12-26"
+        }
+      ],
+      "stat": null,
+      "prospect": {
+        "headline": "자격의 활용 범위와 시장 수요를 함께 살펴야 합니다",
+        "description": "세무사는 세무대리 등 전문 업무와 관련되는 국가전문자격입니다. 응시자 수·합격률의 시계열은 공식 통계 검증 후 제공하며 수치를 임의로 채우지 않습니다.",
+        "career": "세무대리 및 관련 전문서비스. 업무 범위와 등록 요건은 관련 법령 확인 필요."
+      },
+      "application": {
+        "intro": "Q-Net에서 1차·2차 일정을 각각 확인한 뒤 회차별로 접수합니다.",
+        "steps": [
+          "Q-Net 세무사 공식 시행계획과 응시자격·면제 요건 확인",
+          "회원 로그인과 증명사진·기본정보 확인",
+          "응시 차수·시험장 및 필요한 제출서류 확인",
+          "원서 작성 및 수수료 결제",
+          "마이페이지에서 접수 완료 여부, 수험표, 개인별 안내 확인"
+        ],
+        "photoNote": "필요 서류와 사진 규격은 해당 회차 Q-Net 공고를 확인하세요."
+      }
+    }
+  ]
+}

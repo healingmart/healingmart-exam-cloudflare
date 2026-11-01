@@ -111,7 +111,7 @@ function jumpMonth(delta){
 }
 function applyQuery(value){
   state.query=value.trim();state.page=0;$("directoryInput").value=value;$("globalSearch").value=value;
-  renderCatalog();document.querySelector("#directory").scrollIntoView({behavior:"smooth",block:"start"});
+  renderCatalog();const featured=window.EXAM_FOCUS?.query?.(value);document.querySelector(featured?"#examSpotlight":"#directory").scrollIntoView({behavior:"smooth",block:"start"});
   if(state.manifest.fullCatalog&&state.catalog.length<=state.seed.length)loadCatalog();
 }
 function filtered(){
@@ -307,6 +307,7 @@ function qnetDateCard(event){
     '<span class="qnet-date-arrow">→</span></button>';
 }
 async function showOfficialQnetDetail(item){
+  if(window.EXAM_FOCUS?.fromQnet?.(item))return;
   const dialog=$("detailDialog"),body=$("detailBody");
   if(!dialog.open)dialog.showModal();
   const year=Number(state.today.slice(0,4));
