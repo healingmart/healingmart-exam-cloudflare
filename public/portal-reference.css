@@ -1,0 +1,173 @@
+/* HealingMart EXAM: homepage reference-inspired rework
+ * Identity, graphics and content are original. Layout references the
+ * clear hero/sidebar, centered discovery, and news taxonomy of public portals.
+ */
+:root{--ref-ink:#183450;--ref-blue:#236eab;--ref-cyan:#bdeef3}
+html{scroll-padding-top:20px}
+body{background:#fff;color:var(--ref-ink)}
+.site-header{background:#fff}
+.portal-utility{background:#f1f4f8}
+.site-header .brand-mark{background:#216cb4}
+.header-inner{max-width:1460px;grid-template-rows:75px 53px;min-height:128px}
+.side-nav a{font-size:15px;letter-spacing:-.02em}
+.side-nav a.active{color:#246eb1}
+.portal-dashboard{padding-top:38px}
+.portal-feature-grid{grid-template-columns:minmax(0,2.05fr) minmax(310px,.77fr);gap:28px}
+.portal-today-card{position:relative;min-height:463px;border-radius:23px;border:0;background:linear-gradient(116deg,#cdf4f5 0%,#bef0f4 46%,#8cd9e6 100%);box-shadow:none;overflow:hidden;color:#184966}
+.portal-today-card:before{width:640px;height:640px;right:-230px;top:-365px;box-shadow:0 0 0 63px rgba(255,255,255,.18),0 0 0 142px rgba(255,255,255,.11);border-color:rgba(255,255,255,.45);opacity:1}
+.portal-today-card:after{width:480px;height:240px;left:-90px;bottom:-110px;background:radial-gradient(ellipse,rgba(255,255,255,.42),transparent 70%)}
+.portal-feature-content{padding:40px clamp(30px,3.1vw,50px);min-height:463px;max-width:66%;z-index:4}
+.portal-feature-top{gap:10px}
+.portal-feature-kicker{font-size:10px;color:#347d97;font-weight:830;letter-spacing:.14em}
+.reference-top-dot{display:inline-block;vertical-align:middle;width:7px;height:7px;border-radius:50%;background:#ffb44d;margin-right:8px}
+.portal-source-pill{border:1px solid rgba(24,119,153,.19);background:rgba(255,255,255,.45);color:#3a7c9a;padding:4px 10px}
+.portal-feature-date{margin-top:43px;gap:12px;flex-wrap:wrap;color:#477e97;font-size:13px}
+.reference-feature-chip{background:#fff;color:#247ca5;font-size:11px;font-weight:800;padding:7px 12px;border-radius:20px;box-shadow:0 3px 11px rgba(30,139,170,.07)}
+.portal-today-card h3{font-size:clamp(28px,2.45vw,39px);line-height:1.29;letter-spacing:-.053em;color:#154966;margin:16px 0 0;font-weight:830;word-break:keep-all}
+.portal-feature-desc{color:#47758c;font-size:12px;line-height:1.65;margin-top:10px;max-width:420px}
+.portal-today-events{margin-top:13px;gap:7px}
+.portal-today-event{border:1px solid rgba(93,157,176,.21);background:rgba(255,255,255,.65);color:#1b5373;border-radius:9px;padding:10px 12px}
+.portal-today-event:hover{background:#fff}
+.portal-today-event-mark{color:#a96b32;font-size:10px}
+.portal-today-event-name{color:#24536d;font-weight:650;font-size:11px}
+.portal-event-empty{background:rgba(255,255,255,.58);color:#467992;padding:12px}
+.portal-event-empty-icon{color:#d89b34}
+.reference-feature-note{display:flex;align-items:center;gap:7px;font-size:11px;color:#2a7593;margin-top:11px;line-height:1.4}
+.reference-feature-note strong{font-weight:670}
+.reference-sun-icon{font-size:15px;color:#ffac47}
+.portal-feature-cta{color:#fff;background:#206fa8;border-radius:25px;font-size:12px;box-shadow:0 8px 16px rgba(44,111,155,.15);padding:13px 18px}
+.portal-feature-cta:hover{background:#15578a}
+.portal-illustration{width:300px;height:335px;right:4.4%;top:52%;opacity:1;z-index:1}
+.portal-illustration-glow{inset:0;background:radial-gradient(circle,rgba(255,255,255,.7),transparent 65%)}
+.portal-paper{top:50px;left:49px;width:210px;height:261px;transform:rotate(8deg);border-radius:18px;background:linear-gradient(145deg,#fff,#eff7fd 82%);box-shadow:0 22px 40px rgba(16,104,134,.19),0 7px 15px rgba(16,104,134,.08);padding:42px 24px 24px;color:#245777}
+.portal-paper:before{top:20px;left:15px;right:15px;background:#e3edf7}
+.portal-paper-rings{top:-12px;left:36px;gap:83px}
+.portal-paper-rings i{height:28px;border-color:#659db6;border-width:4px;width:10px}
+.portal-paper-top{font-size:9px;letter-spacing:.09em;color:#5c96b5;font-weight:900;white-space:nowrap}
+.portal-paper strong{font-size:105px;color:#256d9e;font-weight:810;letter-spacing:-.09em;line-height:1.13}
+.portal-paper-lines{gap:9px;margin-top:16px}
+.portal-paper-lines i{height:6px;background:#daeaf5;border-radius:3px}
+.portal-paper-lines i:nth-child(2){width:79%}.portal-paper-lines i:nth-child(3){width:57%}
+.portal-paper-check{right:-12px;bottom:10px;background:#ffbd5d;color:#83531b;border:4px solid #e7f6f4;font-weight:900;width:52px;height:52px}
+.reference-pencil{position:absolute;right:8px;top:1px;width:28px;height:231px;background:linear-gradient(90deg,#f6b24b 0 26%,#ffd788 27% 72%,#e69a3a 73%);border-radius:10px 10px 0 0;transform:rotate(36deg);box-shadow:0 10px 18px rgba(45,112,142,.14);z-index:4}
+.reference-pencil:before{content:"";position:absolute;top:0;left:0;width:28px;height:17px;border-radius:9px 9px 0 0;background:#f0776e;border-bottom:4px solid #c9d6df}
+.reference-pencil-tip{position:absolute;bottom:-35px;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:35px solid #f0c69c}
+.reference-pencil-tip:after{content:"";position:absolute;top:-34px;left:-4px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:10px solid #545a5f}
+.reference-orbit{position:absolute;border:2px solid rgba(255,255,255,.5);border-radius:50%;pointer-events:none}
+.reference-orbit-one{width:300px;height:300px;top:-26px;right:-26px}
+.reference-orbit-two{width:230px;height:230px;top:5px;right:12px;border-style:dashed;border-color:rgba(255,255,255,.3)}
+.reference-star{position:absolute;color:#fff;font-size:26px}
+.reference-star-one{top:32px;left:7px}.reference-star-two{right:4px;bottom:25px;color:#ffca68;font-size:31px}
+.reference-check-ring{position:absolute;bottom:18px;left:0;width:45px;height:45px;border:3px solid rgba(255,255,255,.7);border-radius:50%;display:grid;place-items:center;color:#2886ac;font-size:22px;font-weight:900}
+.portal-mini-star{display:none}
+/* Useful quick links and verified seven-day agenda replace dummy login tools */
+.portal-week-card{background:#e9efff;min-height:463px;border-radius:23px;padding:29px 27px;box-shadow:none;gap:0}
+.portal-week-heading{border:0;padding-bottom:5px;display:block}
+.portal-week-eyebrow{font-size:10px;color:#6e89bc;letter-spacing:.1em;margin-bottom:8px}
+.portal-week-heading h3{font-size:21px;color:#233c68;word-break:keep-all;letter-spacing:-.047em;line-height:1.4}
+.portal-week-range{display:none}
+.reference-aside-intro{color:#7688a7;font-size:11px;line-height:1.6;margin:6px 0 15px}
+.reference-quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.reference-quick-action{border:1px solid rgba(203,218,240,.66);background:#fff;border-radius:13px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;padding:14px;min-width:0;min-height:105px;box-shadow:0 4px 12px rgba(63,96,145,.025);color:#314e76;cursor:pointer}
+.reference-quick-action:hover{border-color:#8ebae6;box-shadow:0 6px 16px rgba(55,91,145,.1)}
+.reference-quick-icon{color:#276db1}
+.reference-quick-icon svg{width:26px;height:26px}
+.reference-quick-action>span:last-child{font-size:12px;font-weight:750;white-space:nowrap}
+.reference-chevron{color:#8ba3be;font-size:12px;margin-left:4px}
+.reference-week-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:20px;padding-bottom:6px;border-bottom:1px solid rgba(95,125,179,.18)}
+.reference-week-heading strong{font-size:12px;color:#3a5782}
+.reference-week-heading span{font-size:10px;color:#8a9dbb}
+.portal-week-row{padding:9px 0}
+.portal-week-date-box{width:37px;height:42px}
+.portal-week-date-box strong{font-size:14px}
+.portal-week-copy strong{font-size:11px}
+.portal-week-copy small{font-size:9px}
+.portal-week-events{max-height:107px;overflow-y:auto;min-height:0}
+.portal-week-empty{padding:9px 0}
+.portal-week-empty strong{font-size:11px}
+.portal-week-empty p{font-size:10px;margin-top:4px}
+.portal-week-more{margin-top:auto;font-size:11px;padding-top:11px}
+.portal-week-motivation{display:none}
+/* Centered discovery follows the visual banner, not a wall of monthly calendar rows */
+.portal-dashboard .hero{margin:64px -16px 0;background:linear-gradient(180deg,#f0f8fd 0%,#e9f7ff 78%,#e5f3ff 100%);border-radius:38px}
+.portal-dashboard .hero:before{background:#cdeaff;opacity:.45}.portal-dashboard .hero:after{background:#b8dff9;opacity:.44}
+.portal-dashboard .hero .hero-compact{padding:58px 50px 48px}
+.portal-dashboard .hero-compact-kicker{color:#3184ba;font-weight:820;letter-spacing:.13em;font-size:11px}
+.portal-dashboard .hero-compact h1{font-size:clamp(28px,2.65vw,39px);color:#1b3c62;line-height:1.38;max-width:650px}
+.portal-dashboard .hero-compact h1 em{font-style:normal;color:#1e75c1}
+.portal-dashboard .hero-compact p{color:#6687a4;font-size:13px}
+.portal-dashboard .hero-compact-search{margin-top:25px}
+.portal-dashboard .hero-compact .hero-search{background:#fff;border:2px solid #347fcc;box-shadow:0 7px 21px rgba(62,122,180,.07)}
+.portal-dashboard .hero-compact .hero-search button{background:#2474bd}
+.portal-dashboard .hero-compact .hero-search button:hover{background:#155b97}
+.portal-find-category{border-radius:15px;background:#fff;box-shadow:0 6px 16px rgba(52,105,142,.065);border:1px solid rgba(157,205,235,.35);padding:17px 12px}
+.portal-find-icon{background:#fff}
+.portal-find-category strong{font-size:12px;color:#63788c;font-weight:650}
+.portal-find-category small{font-size:15px;color:#213b59;font-weight:820}
+.portal-find-category:hover{border-color:#9cc5e4}
+.portal-rail-heading{margin-top:57px}
+.portal-rail-heading h3{font-size:23px}
+.portal-day{border-radius:14px}
+.portal-day.selected{border-color:#62a3d7;background:#f0f8fe}
+.portal-news-shelf{margin-top:60px}
+.portal-news-shelf .section-title h2{font-size:30px}
+.portal-news-shelf .brief-card{border-radius:15px}
+@media(max-width:1240px){
+ .portal-feature-grid{grid-template-columns:minmax(0,1.4fr) minmax(300px,.87fr)}
+ .portal-feature-content{max-width:79%;padding:32px}
+ .portal-today-card h3{font-size:31px}
+ .portal-illustration{right:-32px;opacity:.62}
+ .reference-quick-action{padding:11px}
+}
+@media(max-width:870px){
+ .portal-feature-grid{grid-template-columns:1fr}
+ .portal-feature-content{max-width:71%}
+ .portal-today-card,.portal-feature-content{min-height:385px}
+ .portal-illustration{right:6%;opacity:1}
+ .portal-week-card{min-height:335px}
+ .portal-week-events{max-height:135px}
+ .portal-dashboard .hero{margin-top:48px}
+}
+@media(max-width:720px){
+ .header-inner{grid-template-rows:59px 40px;min-height:99px}
+ .portal-dashboard{padding-top:17px}
+ .portal-feature-grid{gap:13px}
+ .portal-today-card{min-height:365px;border-radius:18px}
+ .portal-feature-content{min-height:365px;max-width:100%;padding:23px 21px}
+ .portal-feature-top{gap:6px}
+ .portal-feature-kicker{font-size:10px}
+ .portal-source-pill{font-size:9px}
+ .portal-feature-date{margin-top:26px;font-size:11px;gap:9px}
+ .reference-feature-chip{font-size:10px;padding:6px 9px}
+ .portal-today-card h3{font-size:27px;max-width:310px;letter-spacing:-.05em}
+ .portal-feature-desc{max-width:275px;font-size:11px}
+ .portal-today-events{margin-top:10px}
+ .portal-today-event{padding:9px}
+ .portal-feature-cta{margin-top:auto}
+ .reference-feature-note{font-size:10px;max-width:280px}
+ .portal-illustration{width:145px;height:200px;right:-36px;top:125px;transform:none;opacity:.2}
+ .portal-paper{transform:rotate(12deg) scale(.62);transform-origin:top left}
+ .reference-pencil{transform:rotate(36deg) scale(.7);transform-origin:top right}
+ .reference-orbit{display:none}
+ .portal-week-card{padding:20px;min-height:0;border-radius:16px}
+ .portal-week-heading h3{font-size:20px}
+ .reference-aside-intro{margin-bottom:12px}
+ .reference-quick-action{min-height:94px}
+ .reference-week-heading{margin-top:14px}
+ .portal-week-events{max-height:185px}
+ .portal-week-more{padding-top:14px}
+ .portal-dashboard .hero{margin:44px -16px 0;border-radius:24px}
+ .portal-dashboard .hero .hero-compact{padding:36px 16px 30px}
+ .portal-dashboard .hero-compact h1{font-size:24px}
+ .portal-dashboard .hero-compact p{font-size:11px}
+ .portal-find-category strong{font-size:10px}
+ .portal-find-category small{font-size:13px}
+ .portal-rail-heading{margin-top:40px}
+ .portal-rail-heading h3{font-size:18px}
+}
+@media(max-width:380px){
+ .portal-today-card h3{font-size:24px}
+ .portal-feature-content{padding:21px 17px}
+ .reference-feature-note{max-width:240px}
+ .portal-feature-cta{font-size:11px;padding:11px 14px}
+}
