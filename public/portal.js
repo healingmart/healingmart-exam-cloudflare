@@ -116,6 +116,15 @@
   }
   function setup(){
     chosen=state.today;
+    qs("headerSearchOpen")?.addEventListener("click",()=>{
+      qs("overview").scrollIntoView({behavior:"smooth",block:"center"});
+      qs("globalSearch").focus({preventScroll:true});
+    });
+    document.querySelectorAll("[data-portal-schedule]").forEach(button=>button.addEventListener("click",()=>{
+      const type=button.dataset.portalSchedule;
+      document.querySelector('[data-calendar-type="'+type+'"]')?.click();
+      openCalendar(true);
+    }));
     qs("portalCalendarToggle").addEventListener("click",()=>openCalendar(qs("calendarContent").hidden));
     qs("portalTodayFull").addEventListener("click",()=>openCalendar(true));
     document.querySelectorAll('a[href="#calendar"],[data-open-calendar]').forEach(a=>a.addEventListener("click",e=>{

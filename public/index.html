@@ -11,12 +11,13 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="/style.css?v=focus-calendar-20261030-5">
 <link rel="stylesheet" href="/editorial.css?v=editorial-20261101-1">
-<link rel="stylesheet" href="/portal.css?v=portal-20261101-1">
+<link rel="stylesheet" href="/portal.css?v=portal-20261101-2">
 <script defer src="/app.js?v=portal-home-20261101-1"></script>
-<script defer src="/portal.js?v=portal-20261101-1"></script>
+<script defer src="/portal.js?v=portal-20261101-2"></script>
 </head>
 <body>
 <a class="skip" href="#main">본문 바로가기</a>
+<div class="portal-utility"><div class="page-width"><span class="portal-utility-symbol">✓</span> 공공기관 발표 자료를 토대로 제공하는 독립 시험정보 서비스 <a href="#sources">자료 출처 확인 ↗</a></div></div>
 <header class="site-header">
   <div class="page-width header-inner">
     <a href="https://www.healing-mart.com/" class="brand" aria-label="힐링마트 메인으로 이동">
@@ -25,30 +26,10 @@
     <nav class="side-nav" aria-label="주요 메뉴">
       <a href="#today" class="active">오늘</a><a href="#thisWeek">이번 주</a><a href="#calendar">월간 달력</a><a href="#directory">자격증 검색</a><a href="#briefing">공식 소식</a>
     </nav>
-    <div class="header-meta"><span class="date-stamp" id="todayStamp">한국 표준시</span><span class="header-status"><i></i>공식 출처 기반</span></div>
+    <div class="header-meta"><button type="button" class="header-search-launch" id="headerSearchOpen" aria-label="시험정보 검색으로 이동"><span>시험·자격 통합검색</span><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><span class="date-stamp" id="todayStamp">한국 표준시</span><span class="header-status"><i></i>공식 출처 기반</span></div>
   </div>
 </header>
 <main id="main">
-  <section class="hero" id="overview">
-    <div class="page-width hero-compact">
-      <div class="hero-compact-label">
-        <span class="hero-compact-kicker">국가자격 · 민간자격 · 공식 시험정보</span>
-        <h1>시험 정보, 한 곳에서</h1>
-        <p>오늘의 시험부터 원서접수, 자격증 정보까지 쉽고 정확하게.</p>
-      </div>
-      <div class="hero-compact-search">
-        <div class="hero-search">
-          <span class="lens" aria-hidden="true"></span>
-          <label class="sr-only" for="globalSearch">시험명 또는 자격증 검색</label>
-          <input type="search" id="globalSearch" autocomplete="off" placeholder="시험명 또는 자격증 검색">
-          <button type="button" id="heroSearchBtn">검색 <span aria-hidden="true">→</span></button>
-        </div>
-        <div class="search-examples"><span>빠른 검색</span><button type="button" data-query="전기기사">전기기사</button><button type="button" data-query="정보처리기사">정보처리기사</button><button type="button" data-query="바리스타">바리스타</button></div>
-      </div>
-      <span id="heroToday" hidden></span>
-    </div>
-  </section>
-
   <div class="page-width">
 
     <section class="portal-dashboard" id="today" aria-labelledby="portalHead">
@@ -94,26 +75,45 @@
           <a href="#calendar" class="portal-week-more" data-open-calendar>일정 전체 보기 <span aria-hidden="true">↗</span></a>
         </article>
       </div>
+<section class="hero" id="overview">
+    <div class="page-width hero-compact">
+      <div class="hero-compact-label">
+        <span class="hero-compact-kicker">시험·자격 정보 통합검색</span>
+        <h1>나에게 필요한 시험정보를 찾아보세요!</h1>
+        <p>국가자격부터 민간자격까지, 원하는 정보를 빠르게 찾아보세요.</p>
+      </div>
+      <div class="hero-compact-search">
+        <div class="hero-search">
+          <span class="lens" aria-hidden="true"></span>
+          <label class="sr-only" for="globalSearch">자격증명·시험명·시행기관을 검색하세요</label>
+          <input type="search" id="globalSearch" autocomplete="off" placeholder="시험명 또는 자격증 검색">
+          <button type="button" id="heroSearchBtn">검색 <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="search-examples"><span>빠른 검색</span><button type="button" data-query="전기기사">전기기사</button><button type="button" data-query="정보처리기사">정보처리기사</button><button type="button" data-query="바리스타">바리스타</button></div>
+      </div>
+<div class="portal-find-categories" aria-label="분야별 시험정보 바로가기">
+  <button type="button" data-portal-filter="national" class="portal-find-category"><span class="portal-find-icon pc-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3.5" width="12" height="17" rx="2"/><path d="M9 8h6M9 12h4M9 16l2 2 4-4"/></svg></span><span><strong>국가기술·전문자격</strong><small>국가자격</small></span></button>
+  <button type="button" data-portal-filter="private" class="portal-find-category"><span class="portal-find-icon pc-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5c3.5-1.2 6-1.1 8 .1 2-1.2 4.5-1.3 8-.1v12c-3.5-1.2-6-1.1-8 .1-2-1.2-4.5-1.3-8-.1z"/><path d="M12 6.6v12"/></svg></span><span><strong>등록 민간자격</strong><small>민간자격</small></span></button>
+  <button type="button" data-portal-schedule="apply" class="portal-find-category"><span class="portal-find-icon pc-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg></span><span><strong>놓치지 말아야 할</strong><small>원서접수</small></span></button>
+  <button type="button" data-portal-schedule="exam" class="portal-find-category"><span class="portal-find-icon pc-purple" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="5.5" width="15" height="15" rx="2"/><path d="M8 3v5M16 3v5M4.5 10h15M9 14h6M9 17h4"/></svg></span><span><strong>다가오는 시험</strong><small>시험 일정</small></span></button>
+  <button type="button" data-portal-schedule="announce" class="portal-find-category"><span class="portal-find-icon pc-pink" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span><span><strong>결과를 확인하세요</strong><small>합격 발표</small></span></button>
+</div>
+      <span id="heroToday" hidden></span>
+    </div>
+  </section>
       <div class="portal-rail-heading">
         <div><h3>날짜별 빠른 확인</h3><p>오늘부터 7일간의 공식 등록 일정</p></div>
         <span class="portal-rail-hint">날짜를 선택해 확인하세요</span>
       </div>
       <div class="portal-day-rail" id="portalWeekDays" role="group" aria-label="다가오는 7일간 일정 확인"></div>
-      <div class="portal-shortcuts" aria-label="자주 찾는 시험 정보">
-        <button type="button" class="portal-shortcut" data-portal-filter="national">
-          <span class="portal-shortcut-icon portal-shortcut-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8 8h8M8 12h5M9 16l2 2 4-4"/></svg></span>
-          <span><strong>국가자격 찾기</strong><small>Q-Net 공식 시험·자격정보</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
-        </button>
-        <button type="button" class="portal-shortcut" data-portal-filter="private">
-          <span class="portal-shortcut-icon portal-shortcut-mint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4zM8 9h8M8 13h5"/><path d="M8 18.5v2M16 18.5v2"/></svg></span>
-          <span><strong>민간자격 검색</strong><small>등록번호·발급기관까지 확인</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
-        </button>
-        <a class="portal-shortcut" href="#briefing">
-          <span class="portal-shortcut-icon portal-shortcut-peach" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 4h12a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2Z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>
-          <span><strong>시험 공고·소식</strong><small>공식 기관의 최신 안내</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
-        </a>
-      </div>
+
     </section>
+    <div class="portal-news-shelf"><div class="portal-news-top"><span class="portal-news-kicker">OFFICIAL UPDATES</span><p>시험 공고와 주요 변경사항을 공식 출처로 확인하세요.</p></div>    <section class="section" id="briefing">
+      <div class="section-title"><div><span class="eyebrow">공식 소식</span><h2>시험 공고와 주요 변경사항</h2><p>시험 시행계획과 제도 변경 내용을 기관 원문으로 확인하세요.</p></div></div>
+      <div class="briefing-list" id="briefingList"></div>
+    </section>
+
+</div>
     <section class="portal-calendar-access" id="calendar" aria-labelledby="portalCalendarHead">
       <div class="portal-calendar-teaser">
         <div class="portal-calendar-teaser-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="7" width="24" height="21" rx="4"/><path d="M4 13h24M10 4v6M22 4v6M10 19h4M18 19h4M10 24h4"/></svg></div>
@@ -183,11 +183,6 @@
         <div class="ranking-panel"><div class="ranking-top"><div><span class="submark">공식 통계</span><h3>시험 데이터 비교</h3></div><span id="rankingYear" class="year-tag">자료 검증 중</span></div><div class="rank-tabs" id="rankTabs" role="group" aria-label="순위 종류"><button type="button" data-rank="applicants" class="selected" aria-pressed="true">응시자 많은 시험</button><button type="button" data-rank="difficulty" aria-pressed="false">합격률 낮은 시험</button><button type="button" data-rank="growth" aria-pressed="false">관심 증가 자격</button></div><div class="ranking-content" id="rankingContent"></div><p class="footnote">합격률은 실제 난이도와 같지 않습니다. 집계연도·산식·모집단이 확인되지 않은 자료는 순위에 포함하지 않습니다.</p></div>
         <aside class="fact-panel"><span class="fact-label">데이터 기준</span><h3>확인된 정보만<br>명확하게.</h3><p>시험 일정과 통계는 공식 발표를 기준으로 확인하고, 출처를 함께 제공합니다.</p><a href="#sources">데이터 출처 살펴보기 ↗</a></aside>
       </div>
-    </section>
-
-    <section class="section" id="briefing">
-      <div class="section-title"><div><span class="eyebrow">공식 소식</span><h2>시험 공고와 주요 변경사항</h2><p>시험 시행계획과 제도 변경 내용을 기관 원문으로 확인하세요.</p></div></div>
-      <div class="briefing-list" id="briefingList"></div>
     </section>
 
     <section class="section sources-section" id="sources">
