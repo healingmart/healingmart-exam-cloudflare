@@ -228,6 +228,7 @@ async function main(){
     state.events=(dates.events||[]).filter(officialEvent).sort((a,b)=>a.date.localeCompare(b.date));
     state.rankings=ranks||{};state.briefs=Array.isArray(briefs)?briefs:[];
     readStats();showCalendar();renderCatalog();showRank();showBriefing();renderHeroUpcoming();
+    if(typeof window.updatePortalDashboard==="function")window.updatePortalDashboard();
     if(location.hash==="#directory"&&state.manifest.fullCatalog)loadCatalog();
   }catch(err){
     console.error("EXAM_BOOTSTRAP_FAILED",err);

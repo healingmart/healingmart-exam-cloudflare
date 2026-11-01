@@ -11,7 +11,9 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="/style.css?v=focus-calendar-20261030-5">
 <link rel="stylesheet" href="/editorial.css?v=editorial-20261101-1">
+<link rel="stylesheet" href="/portal.css?v=portal-20261101-1">
 <script defer src="/app.js?v=focus-calendar-20261030-5"></script>
+<script defer src="/portal.js?v=portal-20261101-1"></script>
 </head>
 <body>
 <a class="skip" href="#main">본문 바로가기</a>
@@ -21,7 +23,7 @@
       <span class="brand-mark" aria-hidden="true">H<span>.</span></span><span class="brand-word"><strong>HealingMart</strong><span>EXAM</span></span>
     </a>
     <nav class="side-nav" aria-label="주요 메뉴">
-      <a href="#overview" class="active">홈</a><a href="#calendar">시험 일정</a><a href="#directory">자격증 검색</a><a href="#pulse">시험 통계</a><a href="#briefing">공식 소식</a>
+      <a href="#today" class="active">오늘</a><a href="#thisWeek">이번 주</a><a href="#calendar">월간 달력</a><a href="#directory">자격증 검색</a><a href="#briefing">공식 소식</a>
     </nav>
     <div class="header-meta"><span class="date-stamp" id="todayStamp">한국 표준시</span><span class="header-status"><i></i>공식 출처 기반</span></div>
   </div>
@@ -31,8 +33,8 @@
     <div class="page-width hero-compact">
       <div class="hero-compact-label">
         <span class="hero-compact-kicker">국가자격 · 민간자격 · 공식 시험정보</span>
-        <h1>시험 캘린더</h1>
-        <p>접수부터 시험·합격 발표까지 한눈에 확인하세요.</p>
+        <h1>시험 정보, 한 곳에서</h1>
+        <p>오늘의 시험부터 원서접수, 자격증 정보까지 쉽고 정확하게.</p>
       </div>
       <div class="hero-compact-search">
         <div class="hero-search">
@@ -48,7 +50,79 @@
   </section>
 
   <div class="page-width">
-    <section class="section calendar-section" id="calendar">
+
+    <section class="portal-dashboard" id="today" aria-labelledby="portalHead">
+      <div class="portal-heading">
+        <div>
+          <div class="portal-eyebrow"><span class="portal-live-dot" aria-hidden="true"></span> 공식 일정 브리핑</div>
+          <h2 id="portalHead">오늘의 시험 소식 <span class="portal-wave" aria-hidden="true">✦</span></h2>
+          <p>날짜별로 꼭 확인해야 할 시험과 접수 정보를 모았습니다.</p>
+        </div>
+        <a class="portal-heading-link" href="#calendar" data-open-calendar>월간 일정 확인 <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="portal-feature-grid">
+        <article class="portal-today-card">
+          <div class="portal-feature-content">
+            <div class="portal-feature-top"><span class="portal-feature-kicker">TODAY · 오늘의 공식 일정</span><span class="portal-source-pill">검증 자료 기준</span></div>
+            <div class="portal-feature-date"><span id="portalDateText">오늘 날짜</span><span class="portal-date-line" aria-hidden="true"></span></div>
+            <h3 id="portalTodayHeading">오늘의 시험 일정을 확인하세요</h3>
+            <p class="portal-feature-desc" id="portalTodayDesc">공식 일정 정보를 불러오고 있습니다.</p>
+            <div class="portal-today-events" id="portalTodayEvents" aria-live="polite"></div>
+            <button type="button" class="portal-feature-cta" id="portalTodayFull">월간 일정 자세히 보기 <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="portal-illustration" aria-hidden="true">
+             <div class="portal-illustration-glow"></div>
+             <div class="portal-paper">
+               <div class="portal-paper-rings"><i></i><i></i></div>
+               <span class="portal-paper-top">EXAM DAY</span>
+               <strong id="portalArtDay">01</strong>
+               <div class="portal-paper-lines"><i></i><i></i><i></i></div>
+               <span class="portal-paper-check">✓</span>
+             </div>
+             <div class="portal-mini-star">✳</div>
+          </div>
+        </article>
+        <article class="portal-week-card" id="thisWeek">
+          <div class="portal-week-heading">
+            <div><div class="portal-week-eyebrow">WEEKLY CHECK</div><h3>이번 주 체크포인트</h3></div>
+            <span class="portal-week-range" id="portalWeekRange">다가오는 7일</span>
+          </div>
+          <div class="portal-week-events" id="portalWeekEvents" aria-live="polite">
+            <p class="portal-loading">공식 일정을 확인하고 있습니다.</p>
+          </div>
+          <div class="portal-week-motivation"><span class="portal-week-motivation-icon" aria-hidden="true">✦</span><div><strong>오늘도 당신의 도전을 응원합니다.</strong><p>접수 마감과 개별 시험일은 공식 공고에서 최종 확인하세요.</p></div></div>
+          <a href="#calendar" class="portal-week-more" data-open-calendar>일정 전체 보기 <span aria-hidden="true">↗</span></a>
+        </article>
+      </div>
+      <div class="portal-rail-heading">
+        <div><h3>날짜별 빠른 확인</h3><p>오늘부터 7일간의 공식 등록 일정</p></div>
+        <span class="portal-rail-hint">날짜를 선택해 확인하세요</span>
+      </div>
+      <div class="portal-day-rail" id="portalWeekDays" role="group" aria-label="다가오는 7일간 일정 확인"></div>
+      <div class="portal-shortcuts" aria-label="자주 찾는 시험 정보">
+        <button type="button" class="portal-shortcut" data-portal-filter="national">
+          <span class="portal-shortcut-icon portal-shortcut-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8 8h8M8 12h5M9 16l2 2 4-4"/></svg></span>
+          <span><strong>국가자격 찾기</strong><small>Q-Net 공식 시험·자격정보</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="portal-shortcut" data-portal-filter="private">
+          <span class="portal-shortcut-icon portal-shortcut-mint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4zM8 9h8M8 13h5"/><path d="M8 18.5v2M16 18.5v2"/></svg></span>
+          <span><strong>민간자격 검색</strong><small>등록번호·발급기관까지 확인</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
+        </button>
+        <a class="portal-shortcut" href="#briefing">
+          <span class="portal-shortcut-icon portal-shortcut-peach" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 4h12a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2Z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>
+          <span><strong>시험 공고·소식</strong><small>공식 기관의 최신 안내</small></span><span class="portal-shortcut-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+    <section class="portal-calendar-access" id="calendar" aria-labelledby="portalCalendarHead">
+      <div class="portal-calendar-teaser">
+        <div class="portal-calendar-teaser-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="7" width="24" height="21" rx="4"/><path d="M4 13h24M10 4v6M22 4v6M10 19h4M18 19h4M10 24h4"/></svg></div>
+        <div><span class="portal-teaser-eyebrow">MONTHLY CALENDAR</span><h2 id="portalCalendarHead">한 달의 시험 일정이 궁금하다면</h2><p>원서접수·시험·합격 발표 일정을 월별로 자세히 살펴보세요.</p></div>
+        <button type="button" id="portalCalendarToggle" class="portal-calendar-toggle" aria-controls="calendarContent" aria-expanded="false">월간 캘린더 펼치기 <span aria-hidden="true">⌄</span></button>
+      </div>
+      <div id="calendarContent" hidden>
+
+        <section class="section calendar-section" id="calendarView">
       <h2 class="sr-only">월별 시험 일정</h2>
       <div class="calendar-actions">
         <div class="calendar-type-filters" id="calendarTypeFilters" role="group" aria-label="일정 종류">
@@ -78,6 +152,8 @@
         </aside>
       </div>
       <details class="month-schedule"><summary>이번 달 전체 시험·접수 일정 <span id="monthScheduleCount">—</span></summary><div class="month-schedule-list" id="monthEventList"></div></details>
+        </section>
+      </div>
     </section>
 
     <section class="number-strip" aria-label="자격정보 자료 현황">
